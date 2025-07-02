@@ -16,8 +16,8 @@ const HeaderMenu = ({ color, menu }: HeaderMenuProps) => {
     <div className="hidden md:block ml-auto">
       <nav aria-label="Global">
         <ul className="flex items-center gap-12 text-sm">
-          {menu.map((item) => (
-            <li>
+          {menu.map((item, index) => (
+            <li key={`${item.name}-${index}`}>
               <a
                 className={`${colorOptions[color]} transition`}
                 href={item.link}

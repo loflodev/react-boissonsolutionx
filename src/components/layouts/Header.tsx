@@ -1,10 +1,13 @@
-// interface HeaderProps {}
-
+import { useNavigate } from "react-router-dom";
 import type { Menu } from "../../type";
+import Button from "../common/Button";
 import HamburgerMenu from "../common/HamburgerMenu";
 import HeaderMenu from "../common/HeaderMenu";
+import HeaderLogo from "../common/HearderLogo";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   const menu: Menu[] = [
     {
       name: "Acceuil",
@@ -12,61 +15,35 @@ const Header = () => {
     },
     {
       name: "Produits",
-      link: "#",
+      link: "#ourProducts",
     },
     {
       name: "À propos de nous",
-      link: "#",
+      link: "#about",
     },
     {
       name: "Où acheter",
-      link: "#",
+      link: "#contact",
     },
   ];
+
+  const handleClick = () => {
+    navigate("/#contactForm");
+    const section = document.getElementById("contactForm");
+    if (section) {
+      section.scrollIntoView({ behavior: "instant" });
+    }
+  };
+
   return (
-    <header className="bg-gray-900">
+    <header className="bg-gray-900 fixed top-0 left-0 w-full z-50 opacity-95">
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-22 items-center justify-between">
-          <div className="md:flex md:items-center md:gap-12">
-            <a className="block text-teal-600 dark:text-teal-600" href="#">
-              <span className="sr-only">Home</span>
-              <img
-                className="w-[180px] md:w-auto"
-                src="/bsx-logo.webp"
-                alt="Boisson Solution X Logo"
-              />
-            </a>
-          </div>
+        <div className="flex py-4 items-center justify-between">
+          <HeaderLogo alt="Boissson SolutionX" link="#" logo="/bsx-logo.webp" />
           <HeaderMenu color="primary" menu={menu} />
 
           <div className="flex items-center gap-4 ml-12">
-            <div className="sm:flex sm:gap-4">
-              <a
-                className="rounded-full bg-secondary px-8 py-2.5 text-lg font-medium text-dark shadow-sm dark:hover:bg-btn-hover"
-                href="#"
-              >
-                Contact
-              </a>
-            </div>
-
-            {/* <div className="block md:hidden">
-              <button className="rounded-sm bg-gray-100 p-2 text-gray-600 transition hover:text-gray-600/75 dark:bg-gray-800 dark:text-white dark:hover:text-white/75">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="size-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              </button>
-            </div> */}
+            <Button label="Contact" variant="primary" onClick={handleClick} />
             <HamburgerMenu menu={menu} />
           </div>
         </div>

@@ -37,13 +37,14 @@ const HamburgerMenu = ({ menu }: HamburgerMenuProps) => {
       </div>
 
       {isOpen && (
-        <div className="absolute top-22 left-[50%] w-screen h-[91vh] transform -translate-x-1/2 md:hidden">
+        <div className="absolute top-20 left-[50%] w-screen h-[35vh] transform -translate-x-1/2 md:hidden bg-gray-900 opacity-95">
           <ul className="space-y-1 flex flex-col grow">
             {menu.map((item, index) => (
               <li key={`${item.name}-${index}`}>
                 <a
                   href={item.link}
-                  className="block px-8 py-2 text-sm font-medium hover:text-gray-200 text-gray-400 hover:bg-gray-800"
+                  className="block px-8 py-2 text-lg font-medium hover:text-secondary text-gray-400"
+                  onClick={toggleMenu}
                 >
                   {item.name}
                 </a>
