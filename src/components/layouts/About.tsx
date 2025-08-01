@@ -17,7 +17,7 @@ const About = () => {
             specimen book. It has survived not only five centuries.
           </p>
           <Button
-            label="Learn More About us"
+            label="En Savoir plus"
             variant="secondary"
             fitContent={false}
           />

@@ -1,41 +1,25 @@
+import { useNavigate } from "react-router-dom";
 import Button from "../common/Button";
 import Section from "../common/Section";
+import type { ProductCard } from "../../type";
 
-interface OurProducts {
-  title: string;
-  image: string;
-  excerpt: string;
-  link: string;
+interface ProductCardProps {
+  products: ProductCard[];
 }
+const OurProduct = ({ products }: ProductCardProps) => {
+  const navigate = useNavigate();
 
-const OurProduct = () => {
-  const products: OurProducts[] = [
-    {
-      title: "SolutionX - Betterave",
-      image: "/betterave.PNG",
-      excerpt:
-        "Eau, petit cola, betterave, melon d’eau, fruit de la passion,céléry, persil.",
-      link: "#",
-    },
-    {
-      title: "SolutionX - Ginger",
-      image: "/ginger.PNG",
-      excerpt:
-        "Eau, petit cola, gingembre, fruit de la passion, curcuma, céléri, persil.",
-      link: "#",
-    },
-    {
-      title: "SolutionX - Hibiscus",
-      image: "/hibiscus.PNG",
-      excerpt:
-        "Eau, petit cola, hibiscus, melon d’eau, fruit de la passion, céléri, persil",
-      link: "#",
-    },
-  ];
+  const handleClick = (to: string | undefined) => {
+    if (to) navigate(to);
+    const section = document.getElementById("contactForm");
+    if (section) {
+      section.scrollIntoView({ behavior: "instant" });
+    }
+  };
   return (
     <Section
       backgroundColor="lightgray"
-      sectionTitle="Our Products"
+      sectionTitle="Nos Produits"
       fullVh={false}
       id="ourProducts"
     >
@@ -44,19 +28,30 @@ const OurProduct = () => {
           {products.map((item, index) => (
             <div
               className="item rounded-4xl shadow-2xl"
-              key={`${item}-${index}`}
+              key={`${item.name}-${index}`}
             >
               <div>
                 <img
                   className="w-full rounded-tr-4xl rounded-tl-4xl  object-cover"
-                  src={item.image}
-                  alt={item.title}
+                  src={item.cover.node.sourceUrl}
+                  alt={item.name}
                 />
               </div>
-              <div className="px-10 md:py-8 py-12 flex flex-col gap-6">
-                <h4 className="font-bold md:text-lg text-2xl">{item.title}</h4>
-                <p className="md:text-lg text-xl">{item.excerpt}</p>
-                <Button label="En savoir plus" variant="secondary" />
+              <div className="px-6 md:pt-6 pt-10 md:pb-8 pb-12 flex flex-col">
+                <h4 className="font-bold md:text-lg text-2xl">{item.name}</h4>
+                <p className="md:text-[15px] text-base my-6">
+                  {item.description}
+                </p>
+                <div className="flex justify-between text-[11px] mb-4">
+                  <p>{item.features.feature1}</p>
+                  <p>{item.features.feature2}</p>
+                </div>
+                <Button
+                  label={item.button.label}
+                  variant="secondary"
+                  btnSize="0"
+                  onClick={() => handleClick(item.button.link?.url)}
+                />
               </div>
             </div>
           ))}

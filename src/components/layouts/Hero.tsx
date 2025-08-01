@@ -1,8 +1,17 @@
 // interface HeroProps {}
 
+import { useNavigate } from "react-router-dom";
 import Button from "../common/Button";
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate("/#ourProducts");
+    const section = document.getElementById("ourProducts");
+    if (section) {
+      section.scrollIntoView({ behavior: "instant" });
+    }
+  };
   return (
     <section
       className="w-full bg-cover bg-center bg-no-repeat relative overflow-hidden bg-[url(/herobg.png)]"
@@ -45,11 +54,12 @@ const Hero = () => {
               </p>
 
               <Button
-                label="Découvrez Notre Produit"
+                label="Découvrez Nos Produits"
                 variant="secondary"
                 fitContent={false}
                 btnSize="2"
                 btnClass="text-lg font-bold"
+                onClick={handleClick}
               />
             </div>
           </div>

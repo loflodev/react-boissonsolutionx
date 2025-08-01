@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 type ButtonColoType = "primary" | "secondary";
-type ButtonSize = "1" | "2" | "4" | "8";
+type ButtonSize = "0" | "1" | "2" | "4" | "8";
 
 interface Button {
   label: string;
@@ -19,6 +19,7 @@ const Button = ({
   fitContent = true,
   btnClass,
   btnSize = "1",
+  ...rest
 }: Button) => {
   const fit = fitContent ? "grow" : "";
   const colorOptions: Record<ButtonColoType, string> = {
@@ -27,6 +28,7 @@ const Button = ({
   };
 
   const size: Record<ButtonSize, string> = {
+    "0": "py-1.5",
     "1": "py-2.5",
     "2": "py-4",
     "4": "py-8",
@@ -41,6 +43,7 @@ const Button = ({
         <button
           className={`${colorOptions[variant]} ${fit} ${btnDefault} rounded-full px-8 ${size[btnSize]}  cursor-pointer ${btnClass}`}
           onClick={onClick}
+          {...rest}
         >
           {label}
         </button>

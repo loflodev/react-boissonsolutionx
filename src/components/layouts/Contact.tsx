@@ -27,7 +27,7 @@ const Contact = () => {
   return (
     <Section
       backgroundColor="lightgray"
-      sectionTitle="Find Soluction Near You"
+      sectionTitle="Solution locale pour vous"
       id="contact"
     >
       <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(270px,1fr))] grid-rows-auto gap-8">
