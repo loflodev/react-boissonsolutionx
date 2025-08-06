@@ -99,42 +99,31 @@ export const submitContactForm = async (
       throw new ValidationError("All fields are required");
     }
 
-    const response = await axiosInstance.post<ContactFormResponse>("/graphql", {
-      query,
+    const response = await axiosInstance.post("/graphql", {
+      query: query,
       variables: {
-        fullName: formData.fullName,
-        email: formData.email,
-        message: formData.message,
+        input: {
+          clientMutationId: "contact-form-submission",
+          title: `Contact from ${formData.fullName}`,
+          content: `Name: ${formData.fullName}\nEmail: ${formData.email}\nMessage: ${formData.message}`,
+          status: "publish",
+        },
       },
     });
 
-    if (response.data.errors && response.data.errors.length > 0) {
-      const errorMessage = response.data.errors
-        .map((error) => error.message)
-        .join("; ");
-
-      throw new GraphQLServiceError(
-        `GraphQL errors: ${errorMessage}`,
-        response.data.errors,
+    if (response.data.errors) {
+      throw new NetworkError(
+        "No data return form API endpoint",
         response.status
       );
     }
-
-    // Check if data exists
-    if (!response.data.success) {
-      throw new GraphQLServiceError(
-        "No data returned from GraphQL endpoint",
-        [],
-        response.status
-      );
-    }
-
     return response.data;
   } catch (error) {
     // Handle different types of errors
     if (
       error instanceof GraphQLServiceError ||
-      error instanceof ValidationError
+      error instanceof ValidationError ||
+      error instanceof NetworkError
     ) {
       throw error;
     }

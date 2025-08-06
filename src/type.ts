@@ -78,11 +78,16 @@ export interface ContactFormData {
 }
 
 export interface ContactFormResponse {
-  success: boolean;
-  message: string;
-  contactMessage?: {
-    id: string;
-    title: string;
+  data?: {
+    createContactMessage: {
+      clientMutationId: string;
+      contactMessage: {
+        id: string;
+        title: string;
+        content: string;
+        status: string;
+      };
+    };
   };
   errors?: GraphQLError[];
 }

@@ -36,7 +36,7 @@ const useContactFormQuery = () => {
     mutationFn: (data: ContactFormData) =>
       submitContactForm(SUBMIT_CONTACT_FORM_QUERY, data),
     onSuccess: (result: ContactFormResponse) => {
-      if (result.success) {
+      if (result.data && result.data.createContactMessage && !result.errors) {
         setSubmitStatus("success");
         setSubmitMessage("Thank you! Your message has been sent successfully.");
         setFormData({ fullName: "", email: "", message: "" });
@@ -44,7 +44,7 @@ const useContactFormQuery = () => {
       } else {
         setSubmitStatus("error");
         setSubmitMessage(
-          result.message || "Something went wrong. Please try again."
+          "Something went wrong with your submission. Please try again."
         );
       }
     },
