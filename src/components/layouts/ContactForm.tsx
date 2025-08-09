@@ -1,13 +1,13 @@
 import useContactFormQuery from "../../hooks/useContactFormQuery";
-// import Button from "../common/Button";
+import Button from "../common/Button";
 import Section from "../common/Section";
 
 const ContactForm = () => {
   const {
     formData,
     errors,
-    // submitStatus,
-    // submitMessage,
+    submitStatus,
+    submitMessage,
     isSubmitting,
     handleInputChange,
     handleSubmit,
@@ -16,7 +16,7 @@ const ContactForm = () => {
   return (
     <Section
       backgroundColor="dark"
-      sectionTitle="Nous contacter"
+      sectionTitle="Nous Contacter"
       id="contactForm"
     >
       <form
@@ -30,7 +30,7 @@ const ContactForm = () => {
             name="fullName"
             value={formData.fullName}
             onChange={handleInputChange}
-            className="form-input"
+            className={`${errors.fullName ? "border-red-500" : ""} form-input`}
           />
           {errors.fullName && (
             <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
@@ -45,9 +45,7 @@ const ContactForm = () => {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            className={`form-input ${
-              errors.email ? "border-red-500" : "border-gray-300"
-            }`}
+            className={`${errors.email ? "border-red-500" : ""} form-input`}
           />
           {errors.email && (
             <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -62,7 +60,7 @@ const ContactForm = () => {
             value={formData.message}
             onChange={handleInputChange}
             className={`form-input h-50 mb-6 ${
-              errors.message ? "border-red-500" : "border-gray-300"
+              errors.message ? "border-red-500" : ""
             }`}
           />
           {errors.message && (
@@ -70,19 +68,17 @@ const ContactForm = () => {
           )}
         </label>
 
-        {/* <Button label="Envoyer ton message" variant="secondary" /> */}
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
           onClick={handleSubmit}
-          className={`bg-red-500 text-white hover:bg-red-600 ${
-            isSubmitting
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          } text-white`}
-        >
-          Envoyer ton message
-        </button>
+          asLink={false}
+          label="Envoyer ton message"
+          variant="secondary"
+          isLoading={isSubmitting}
+          submitStatus={submitStatus}
+          submitMessage={submitMessage}
+        />
       </form>
     </Section>
   );

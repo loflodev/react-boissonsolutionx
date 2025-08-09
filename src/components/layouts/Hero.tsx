@@ -1,9 +1,11 @@
-// interface HeroProps {}
-
+interface HeroProps {
+  heroData: HeroSection | undefined;
+}
 import { useNavigate } from "react-router-dom";
 import Button from "../common/Button";
+import type { HeroSection } from "../../type";
 
-const Hero = () => {
+const Hero = ({ heroData }: HeroProps) => {
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/#ourProducts");
@@ -14,7 +16,7 @@ const Hero = () => {
   };
   return (
     <section
-      className="w-full bg-cover bg-center bg-no-repeat relative overflow-hidden bg-[url(/herobg.png)]"
+      className="w-full bg-cover bg-center bg-no-repeat relative overflow-hidden bg-[url(/bottles.webp)]"
       id="hero"
     >
       <div className="absolute lg:hidden block inset-0 bg-black opacity-70 mt-20"></div>
@@ -39,19 +41,27 @@ const Hero = () => {
             <div className="text-white space-y-6 lg:pl-8">
               <div className="space-y-2">
                 <h1 className="text-red-500 text-2xl lg:text-3xl font-bold tracking-wide">
-                  LA BOISSON
+                  {heroData?.title}
                 </h1>
                 <h2 className="text-white text-4xl lg:text-6xl font-bold leading-tight">
-                  DES PUISSANTS
+                  {heroData?.subtitle}
                 </h2>
               </div>
 
-              <p className="text-gray-200 text-lg lg:text-xl leading-relaxed max-w-lg">
+              {/* <p className="text-gray-200 text-lg lg:text-xl leading-relaxed max-w-lg">
                 <strong className="text-secondary">Boisson SolutionX </strong>
                 vise à offrir un coup de pouce énergétique plus sain, tout en
                 améliorant la vigilance et la performance physique, et en
                 soutenant le bien-être à long terme.
-              </p>
+              </p> */}
+              {/* <div>{heroData?.description}</div> */}
+
+              <div
+                className="text-shadow "
+                dangerouslySetInnerHTML={{
+                  __html: `${heroData?.description}`,
+                }}
+              />
 
               <Button
                 label="Découvrez Nos Produits"

@@ -25,7 +25,6 @@ const useContactFormQuery = () => {
     email: "",
     message: "",
   });
-
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
@@ -38,13 +37,13 @@ const useContactFormQuery = () => {
     onSuccess: (result: ContactFormResponse) => {
       if (result.data && result.data.createContactMessage && !result.errors) {
         setSubmitStatus("success");
-        setSubmitMessage("Thank you! Your message has been sent successfully.");
+        setSubmitMessage("Merci, envoyé !");
         setFormData({ fullName: "", email: "", message: "" });
         setErrors({});
       } else {
         setSubmitStatus("error");
         setSubmitMessage(
-          "Something went wrong with your submission. Please try again."
+          "Soumission échouée !"
         );
       }
     },
@@ -70,19 +69,19 @@ const useContactFormQuery = () => {
     const newErrors: FormErrors = {};
 
     if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
+      newErrors.fullName = "Nom complet requis";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = "Courriel requis";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = "Adresse courriel invalide";
     }
 
     if (!formData.message.trim()) {
-      newErrors.message = "Message is required";
+      newErrors.message = "Message requis";
     } else if (formData.message.trim().length < 10) {
-      newErrors.message = "Message must be at least 10 characters long";
+      newErrors.message = "Le message doit contenir au moins 10 caractères";
     }
 
     setErrors(newErrors);

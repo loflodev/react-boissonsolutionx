@@ -9,7 +9,7 @@ interface UseHomePageDataReturn {
   data: { page: Page } | undefined;
   error: Error | null;
   products: ProductCard[];
-  heroSectionData: Page["heroSection"] | undefined;
+  heroData: Page["heroSection"] | undefined;
   isLoading: boolean;
   isError: boolean;
   isSuccess: boolean;
@@ -30,14 +30,14 @@ const useHomePageData = (): UseHomePageDataReturn => {
   });
 
   const products = data ? convertToArray(data.page.ourProducts) : [];
-  const heroSectionData = data?.page.heroSection;
+  const heroData = data?.page.heroSection;
 
   return {
     status,
     data,
     error,
     products,
-    heroSectionData,
+    heroData,
     isLoading,
     isError,
     isSuccess,

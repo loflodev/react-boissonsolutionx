@@ -6,15 +6,11 @@ import OurProduct from "../components/layouts/OurProduct";
 import useHomePageData from "../hooks/useHomePageData";
 
 const Home = () => {
-  const { status, products } = useHomePageData();
-
-  if (status === "pending") {
-    return <div>Loading...</div>;
-  }
+  const { products, heroData } = useHomePageData();
 
   return (
     <>
-      <Hero />
+      <Hero heroData={heroData} />
       <OurProduct products={products} />
       <About />
       <Contact />
