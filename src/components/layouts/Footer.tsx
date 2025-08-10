@@ -26,7 +26,7 @@ const Footer = () => {
 
         <p className="text-gray-500 text-center">
           Copyright &copy; 2025. All rights reserved. Develop by{" "}
-          <a href="https://www.instagram.com/louis_thereborn" target="_blank">
+          <a className="underline" href="https://www.instagram.com/louis_thereborn" target="_blank">
             Louis Jr Florival
           </a>
         </p>
