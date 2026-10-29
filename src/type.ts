@@ -56,7 +56,7 @@ export interface GraphQLError {
     column: number;
   }>;
   path?: string[];
-  extensions?: Record<string, any>;
+  extensions?: Record<string, unknown>;
 }
 export interface HomePageDataResponse {
   data?: {
