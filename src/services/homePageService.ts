@@ -102,7 +102,7 @@ export const submitContactForm = async (
       throw new ValidationError("All fields are required");
     }
 
-    const response = await axiosInstance.post("/graphql", {
+    const response = await axiosInstance.post<ContactFormResponse>("/graphql", {
       query: query,
       variables: {
         input: {
@@ -114,9 +114,14 @@ export const submitContactForm = async (
       },
     });
 
-    if (response.data.errors) {
-      throw new NetworkError(
-        "No data return form API endpoint",
+    if (response.data.errors && response.data.errors.length > 0) {
+      const errorMessage = response.data.errors
+        .map((error) => error.message)
+        .join("; ");
+
+      throw new GraphQLServiceError(
+        `GraphQL errors: ${errorMessage}`,
+        response.data.errors,
         response.status
       );
     }

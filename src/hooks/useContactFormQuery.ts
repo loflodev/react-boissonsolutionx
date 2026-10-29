@@ -61,12 +61,9 @@ const useContactFormQuery = () => {
       }
       console.error("Contact form error:", error);
     },
-    retry: (failureCount, error) => {
-      if (error instanceof ValidationError) {
-        return false;
-      }
-      return failureCount < 3;
-    },
+    // Never retry: a request that timed out may still have been saved,
+    // and a retry would send a duplicate message
+    retry: false,
   });
 
   const validateForm = (): boolean => {
