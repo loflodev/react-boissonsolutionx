@@ -17,6 +17,75 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   submitMessage?: string;
 }
 
+const COLOR_CLASSES: Record<ButtonColoType, string> = {
+  primary: "bg-secondary text-dark shadow-sm hover:bg-btn-hover",
+  secondary: "bg-red-500 text-white hover:bg-red-600",
+};
+
+const SIZE_CLASSES: Record<ButtonSize, string> = {
+  "0": "py-1.5",
+  "1": "py-2.5",
+  "2": "py-4",
+  "4": "py-8",
+  "8": "py-16",
+};
+
+const FLASH_DURATION_MS = 3000;
+
+interface FlashMessage {
+  text: string;
+  type: "success" | "error";
+}
+
+// Show the submit result for a few seconds, then go back to the label
+const useFlashMessage = (
+  submitStatus: ButtonProps["submitStatus"],
+  submitMessage: string | undefined
+) => {
+  const [flash, setFlash] = useState<FlashMessage | null>(null);
+
+  useEffect(() => {
+    if (submitStatus !== "success" && submitStatus !== "error") return;
+
+    setFlash({ text: submitMessage || "", type: submitStatus });
+    const timer = setTimeout(() => setFlash(null), FLASH_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, [submitStatus, submitMessage]);
+
+  return flash;
+};
+
+const ButtonContent = ({
+  label,
+  isLoading,
+  flash,
+}: {
+  label: string;
+  isLoading: boolean;
+  flash: FlashMessage | null;
+}) => {
+  if (flash) {
+    return (
+      <span
+        className={flash.type === "success" ? "text-green-100" : "text-red-100"}
+      >
+        {flash.text}
+      </span>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center gap-2">
+        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+        <span>{label}</span>
+      </div>
+    );
+  }
+
+  return label;
+};
+
 const Button = ({
   label,
   variant,
@@ -31,99 +100,29 @@ const Button = ({
   className,
   ...buttonProps
 }: ButtonProps) => {
-  const fit = fitContent ? "grow" : "";
-  const [showMessage, setShowMessage] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">(
-    "success"
-  );
+  const flash = useFlashMessage(submitStatus, submitMessage);
 
-  useEffect(() => {
-    if (submitStatus === "success" || submitStatus === "error") {
-      setShowMessage(true);
-      setMessage(submitMessage || "");
-      setMessageType(submitStatus);
+  const buttonClasses = [
+    COLOR_CLASSES[variant],
+    fitContent ? "grow" : "",
+    "text-lg font-medium",
+    btnClass,
+    className,
+    "rounded-full px-8",
+    SIZE_CLASSES[btnSize],
+    "cursor-pointer",
+    isLoading ? "bg-gray-400 cursor-not-allowed" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-      const timer = setTimeout(() => {
-        setShowMessage(false);
-        setMessage("");
-      }, 3000); // Show message for 3 seconds
-
-      return () => clearTimeout(timer);
-    }
-  }, [submitStatus, submitMessage]);
-
-  const colorOptions: Record<ButtonColoType, string> = {
-    primary: "bg-secondary text-dark shadow-sm hover:bg-btn-hover",
-    secondary: "bg-red-500 text-white hover:bg-red-600",
-  };
-
-  const size: Record<ButtonSize, string> = {
-    "0": "py-1.5",
-    "1": "py-2.5",
-    "2": "py-4",
-    "4": "py-8",
-    "8": "py-16",
-  };
-
-  const btnDefault = "text-lg font-medium";
-
-  const buttonClasses = `
-    ${colorOptions[variant]} 
-    ${fit} 
-    ${btnDefault} 
-    ${btnClass || ""} 
-    ${className || ""} 
-    rounded-full px-8 
-    ${size[btnSize]} 
-    cursor-pointer
-    ${isLoading ? "bg-gray-400  cursor-not-allowed" : ""}
-  `
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const getButtonContent = () => {
-    if (showMessage) {
-      return (
-        <span
-          className={`${
-            messageType === "success" ? "text-green-100" : "text-red-100"
-          }`}
-        >
-          {message}
-        </span>
-      );
-    }
-
-    if (isLoading) {
-      return (
-        <div className="flex items-center justify-center gap-2">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-          <span>{label}</span>
-        </div>
-      );
-    }
-
-    return label;
-  };
-
-  const content = getButtonContent();
-
-  if (asLink && to) {
-    return (
-      <Link to={to}>
-        <button className={buttonClasses} {...buttonProps}>
-          {content}
-        </button>
-      </Link>
-    );
-  }
-
-  return (
+  const button = (
     <button className={buttonClasses} {...buttonProps}>
-      {content}
+      <ButtonContent label={label} isLoading={isLoading} flash={flash} />
     </button>
   );
+
+  return asLink && to ? <Link to={to}>{button}</Link> : button;
 };
 
 export default Button;
