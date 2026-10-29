@@ -10,6 +10,42 @@ import {
 } from "../type";
 import axiosInstance, { isAxiosError } from "../api/axios";
 
+// Map any thrown value to one of the service error types
+const toServiceError = (error: unknown): Error => {
+  if (
+    error instanceof GraphQLServiceError ||
+    error instanceof ValidationError ||
+    error instanceof NetworkError
+  ) {
+    return error;
+  }
+
+  if (isAxiosError(error)) {
+    const axiosError = error as AxiosError;
+
+    if (axiosError.response) {
+      // Server responded with error status
+      return new NetworkError(
+        `HTTP ${axiosError.response.status}: ${axiosError.response.statusText}`,
+        axiosError.response.status
+      );
+    }
+    if (axiosError.request) {
+      // Network error
+      return new NetworkError("Network error: Unable to reach GraphQL endpoint");
+    }
+    // Request setup error
+    return new NetworkError(`Request error: ${axiosError.message}`);
+  }
+
+  // Unknown error
+  return new Error(
+    `Unexpected error: ${
+      error instanceof Error ? error.message : "Unknown error"
+    }`
+  );
+};
+
 export const getHomePageData = async (
   query: string
 ): Promise<{ page: Page }> => {
@@ -48,40 +84,7 @@ export const getHomePageData = async (
 
     return response.data.data;
   } catch (error) {
-    // Handle different types of errors
-    if (
-      error instanceof GraphQLServiceError ||
-      error instanceof ValidationError
-    ) {
-      throw error;
-    }
-
-    if (isAxiosError(error)) {
-      const axiosError = error as AxiosError;
-
-      if (axiosError.response) {
-        // Server responded with error status
-        throw new NetworkError(
-          `HTTP ${axiosError.response.status}: ${axiosError.response.statusText}`,
-          axiosError.response.status
-        );
-      } else if (axiosError.request) {
-        // Network error
-        throw new NetworkError(
-          "Network error: Unable to reach GraphQL endpoint"
-        );
-      } else {
-        // Request setup error
-        throw new NetworkError(`Request error: ${axiosError.message}`);
-      }
-    }
-
-    // Unknown error
-    throw new Error(
-      `Unexpected error: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+    throw toServiceError(error);
   }
 };
 
@@ -119,40 +122,6 @@ export const submitContactForm = async (
     }
     return response.data;
   } catch (error) {
-    // Handle different types of errors
-    if (
-      error instanceof GraphQLServiceError ||
-      error instanceof ValidationError ||
-      error instanceof NetworkError
-    ) {
-      throw error;
-    }
-
-    if (isAxiosError(error)) {
-      const axiosError = error as AxiosError;
-
-      if (axiosError.response) {
-        // Server responded with error status
-        throw new NetworkError(
-          `HTTP ${axiosError.response.status}: ${axiosError.response.statusText}`,
-          axiosError.response.status
-        );
-      } else if (axiosError.request) {
-        // Network error
-        throw new NetworkError(
-          "Network error: Unable to reach GraphQL endpoint"
-        );
-      } else {
-        // Request setup error
-        throw new NetworkError(`Request error: ${axiosError.message}`);
-      }
-    }
-
-    // Unknown error
-    throw new Error(
-      `Unexpected error: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+    throw toServiceError(error);
   }
 };
