@@ -5,6 +5,10 @@ export interface Menu {
 export interface ImageNode {
   link: string;
   sourceUrl?: string;
+  mediaDetails?: {
+    width: number;
+    height: number;
+  } | null;
 }
 export interface Image {
   node: ImageNode;

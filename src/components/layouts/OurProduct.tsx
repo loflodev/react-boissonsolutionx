@@ -22,9 +22,11 @@ const OurProduct = ({ products }: ProductCardProps) => {
           >
             <article>
               <img
-                className="w-full rounded-tr-4xl rounded-tl-4xl object-cover"
+                className="w-full rounded-tr-4xl rounded-tl-4xl object-cover h-auto"
                 src={item.cover.node.sourceUrl}
                 alt={item.name}
+                width={item.cover.node.mediaDetails?.width}
+                height={item.cover.node.mediaDetails?.height}
                 loading="lazy"
                 decoding="async"
               />

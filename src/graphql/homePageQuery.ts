@@ -26,6 +26,10 @@ export const HOME_PAGE_QUERY = `
           node {
             link
             sourceUrl
+            mediaDetails {
+              width
+              height
+            }
           }
         }
         name
@@ -47,6 +51,10 @@ export const HOME_PAGE_QUERY = `
           node {
             link
             sourceUrl
+            mediaDetails {
+              width
+              height
+            }
           }
         }
         name
@@ -68,6 +76,10 @@ export const HOME_PAGE_QUERY = `
           node {
             link
             sourceUrl
+            mediaDetails {
+              width
+              height
+            }
           }
         }
         name
@@ -89,6 +101,10 @@ export const HOME_PAGE_QUERY = `
           node {
             link
             sourceUrl
+            mediaDetails {
+              width
+              height
+            }
           }
         }
         name
