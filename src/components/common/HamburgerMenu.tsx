@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Menu } from "../../type";
 
 interface HamburgerMenuProps {
   menu: Menu[];
 }
+
+const MOBILE_MENU_ID = "mobile-menu";
 
 const HamburgerMenu = ({ menu }: HamburgerMenuProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -12,11 +14,25 @@ const HamburgerMenu = ({ menu }: HamburgerMenuProps) => {
     setIsOpen((prev) => !prev);
   };
 
+  // Let keyboard users close the menu with Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
   return (
     <>
       <div className="block md:hidden">
         <button
+          type="button"
           className="cursor-pointer rounded-sm p-2 transition bg-gray-800 hover:bg-gray-100 text-white hover:text-gray-600"
+          aria-label={isOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={isOpen}
+          aria-controls={MOBILE_MENU_ID}
           onClick={toggleMenu}
         >
           <svg
@@ -26,6 +42,7 @@ const HamburgerMenu = ({ menu }: HamburgerMenuProps) => {
             viewBox="0 0 24 24"
             stroke="currentColor"
             strokeWidth="2"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -37,13 +54,17 @@ const HamburgerMenu = ({ menu }: HamburgerMenuProps) => {
       </div>
 
       {isOpen && (
-        <div className="absolute top-20 left-[50%] w-screen h-[35vh] transform -translate-x-1/2 md:hidden bg-gray-900 opacity-95">
+        <nav
+          id={MOBILE_MENU_ID}
+          aria-label="Menu mobile"
+          className="absolute top-20 left-[50%] w-screen h-[35vh] transform -translate-x-1/2 md:hidden bg-gray-900 opacity-95"
+        >
           <ul className="space-y-1 flex flex-col grow">
             {menu.map((item, index) => (
               <li key={`${item.name}-${index}`}>
                 <a
                   href={item.link}
-                  className="block px-8 py-2 text-lg font-medium hover:text-secondary text-gray-400"
+                  className="block px-8 py-2 text-lg font-medium hover:text-secondary text-gray-300"
                   onClick={toggleMenu}
                 >
                   {item.name}
@@ -51,7 +72,7 @@ const HamburgerMenu = ({ menu }: HamburgerMenuProps) => {
               </li>
             ))}
           </ul>
-        </div>
+        </nav>
       )}
     </>
   );

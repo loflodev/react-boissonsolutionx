@@ -1,49 +1,44 @@
-import { useNavigate } from "react-router-dom";
 import type { Menu } from "../../type";
 import Button from "../common/Button";
 import HamburgerMenu from "../common/HamburgerMenu";
 import HeaderMenu from "../common/HeaderMenu";
 import HeaderLogo from "../common/HearderLogo";
 
+const menu: Menu[] = [
+  {
+    name: "Accueil",
+    link: "#hero",
+  },
+  {
+    name: "Produits",
+    link: "#ourProducts",
+  },
+  {
+    name: "À propos de nous",
+    link: "#about",
+  },
+  {
+    name: "Où acheter",
+    link: "#contact",
+  },
+];
+
 const Header = () => {
-  const navigate = useNavigate();
-
-  const menu: Menu[] = [
-    {
-      name: "Acceuil",
-      link: "#",
-    },
-    {
-      name: "Produits",
-      link: "#ourProducts",
-    },
-    {
-      name: "À propos de nous",
-      link: "#about",
-    },
-    {
-      name: "Où acheter",
-      link: "#contact",
-    },
-  ];
-
-  const handleClick = () => {
-    navigate("/#contactForm");
-    const section = document.getElementById("contactForm");
-    if (section) {
-      section.scrollIntoView({ behavior: "instant" });
-    }
-  };
-
   return (
     <header className="bg-gray-900 fixed top-0 left-0 w-full z-50 opacity-95">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-dark"
+      >
+        Aller au contenu
+      </a>
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div className="flex py-4 items-center justify-between">
-          <HeaderLogo alt="Boissson SolutionX" link="#" logo="/bsx-logo.webp" />
+          <HeaderLogo alt="Boisson SolutionX – Accueil" link="#hero" logo="/bsx-logo.webp" />
           <HeaderMenu color="primary" menu={menu} />
 
           <div className="flex items-center gap-4 ml-12">
-            <Button label="Contact" variant="primary" onClick={handleClick} />
+            <Button label="Contact" variant="primary" asLink to="#contactForm" />
             <HamburgerMenu menu={menu} />
           </div>
         </div>

@@ -54,9 +54,9 @@ const useContactFormQuery = () => {
     onError: (error: any) => {
       setSubmitStatus("error");
       if (error instanceof ValidationError) {
-        setSubmitMessage("Please check your form data and try again.");
+        setSubmitMessage("Veuillez vérifier vos informations et réessayer.");
       } else {
-        setSubmitMessage("Failed to send message. Please try again later.");
+        setSubmitMessage("Échec de l’envoi du message. Veuillez réessayer plus tard.");
       }
       console.error("Contact form error:", error);
     },

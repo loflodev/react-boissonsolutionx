@@ -9,17 +9,17 @@ interface ContactsType {
 const Contact = () => {
   const contacts: ContactsType[] = [
     {
-      icon: <Mail size={40} color="#fb2c36" />,
+      icon: <Mail size={40} color="#fb2c36" aria-hidden="true" />,
       title: "Livraison Garantie",
       excerpt: "SolutionX livrée à votre porte",
     },
     {
-      icon: <MapPin size={40} color="#fb2c36 " />,
+      icon: <MapPin size={40} color="#fb2c36" aria-hidden="true" />,
       title: "Localisateur de magasins",
       excerpt: "Trouvez SolutionX chez le détaillant le plus près de chez vous",
     },
     {
-      icon: <Phone size={40} color="#fb2c36 " />,
+      icon: <Phone size={40} color="#fb2c36" aria-hidden="true" />,
       title: "Vente en gros",
       excerpt: "Devenez un distributeur de solutionX",
     },
@@ -37,7 +37,7 @@ const Contact = () => {
             className="flex flex-col rounded-2xl items-center justify-center px-10 py-14 shadow-2xl gap-6"
           >
             {item.icon}
-            <h4 className="font-bold md:text-2xl text-lg">{item.title}</h4>
+            <h3 className="font-bold md:text-2xl text-lg">{item.title}</h3>
             <p className="text-base text-center">{item.excerpt}</p>
           </div>
         ))}

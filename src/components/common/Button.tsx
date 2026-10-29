@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 type ButtonColoType = "primary" | "secondary";
 type ButtonSize = "0" | "1" | "2" | "4" | "8";
@@ -19,7 +18,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const COLOR_CLASSES: Record<ButtonColoType, string> = {
   primary: "bg-secondary text-dark shadow-sm hover:bg-btn-hover",
-  secondary: "bg-red-500 text-white hover:bg-red-600",
+  secondary: "bg-red-600 text-white hover:bg-red-700",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
@@ -116,13 +115,21 @@ const Button = ({
     .filter(Boolean)
     .join(" ");
 
-  const button = (
+  // A real anchor (not a button wrapped in a link) so it stays valid,
+  // crawlable and keyboard-native
+  if (asLink && to) {
+    return (
+      <a href={to} className={`${buttonClasses} inline-block text-center`}>
+        {label}
+      </a>
+    );
+  }
+
+  return (
     <button className={buttonClasses} {...buttonProps}>
       <ButtonContent label={label} isLoading={isLoading} flash={flash} />
     </button>
   );
-
-  return asLink && to ? <Link to={to}>{button}</Link> : button;
 };
 
 export default Button;

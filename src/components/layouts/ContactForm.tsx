@@ -21,12 +21,14 @@ const ContactForm = () => {
       id="contactForm"
     >
       <form
-        action=""
+        noValidate
+        onSubmit={handleSubmit}
         className="flex flex-col gap-6 m-auto lg:max-w-[65%] text-white"
       >
         <FormField
           name="fullName"
           label="Nom Complet *"
+          autoComplete="name"
           value={formData.fullName}
           error={errors.fullName}
           onChange={handleInputChange}
@@ -36,6 +38,7 @@ const ContactForm = () => {
           name="email"
           type="email"
           label="Courriel *"
+          autoComplete="email"
           value={formData.email}
           error={errors.email}
           onChange={handleInputChange}
@@ -66,7 +69,6 @@ const ContactForm = () => {
         <Button
           type="submit"
           disabled={isSubmitting}
-          onClick={handleSubmit}
           asLink={false}
           label="Envoyer ton message"
           variant="secondary"
@@ -74,6 +76,11 @@ const ContactForm = () => {
           submitStatus={submitStatus}
           submitMessage={submitMessage}
         />
+
+        {/* The button only flashes the result; announce it to screen readers */}
+        <p role="status" aria-live="polite" className="sr-only">
+          {submitStatus !== "idle" ? submitMessage : ""}
+        </p>
       </form>
     </Section>
   );

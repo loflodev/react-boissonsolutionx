@@ -7,13 +7,14 @@ const Footer = () => {
             className="inline-block rounded-full bg-teal-600 p-2 text-white shadow-sm transition hover:bg-teal-500 sm:p-3 lg:p-4 dark:bg-gray-700 dark:text-teal-300 dark:hover:bg-gray-600"
             href="#hero"
           >
-            <span className="sr-only">Back to top</span>
+            <span className="sr-only">Retour en haut</span>
 
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="size-5"
               viewBox="0 0 20 20"
               fill="currentColor"
+              aria-hidden="true"
             >
               <path
                 fillRule="evenodd"
@@ -24,9 +25,9 @@ const Footer = () => {
           </a>
         </div>
 
-        <p className="text-gray-500 text-center">
-          Copyright &copy; 2025. All rights reserved. Develop by{" "}
-          <a className="underline" href="https://www.instagram.com/louis_thereborn" target="_blank">
+        <p className="text-gray-400 text-center">
+          Copyright &copy; {new Date().getFullYear()} Boisson SolutionX. Tous droits réservés. Développé par{" "}
+          <a className="underline" href="https://www.instagram.com/louis_thereborn" target="_blank" rel="noopener noreferrer">
             Louis Jr Florival
           </a>
         </p>

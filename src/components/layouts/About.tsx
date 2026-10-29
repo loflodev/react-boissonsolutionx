@@ -6,9 +6,9 @@ const About = () => {
     <Section backgroundColor="white" id="about">
       <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-12 grid-rows-auto items-center">
         <div className="flex flex-col gap-8 px-4 md:px-0">
-          <h4 className="text-2xl lg:text-3xl font-bold">
+          <h2 className="text-2xl lg:text-3xl font-bold">
             Chez Boisson SolutionX
-          </h4>
+          </h2>
           <p className="md:text-lg text-xl">
             Nous avons à cœur la vitalité naturelle et l’énergie de chacun de
             nos consommateurs. Tous nos jus de fruits naturels sont mélangés
@@ -34,7 +34,15 @@ const About = () => {
         </div>
 
         <div className="px-4 md:px-0">
-          <img src="/about.png" alt="about us image" />
+          <img
+            src="/about.webp"
+            alt="Logo SolutionX dans une éclaboussure de jus rouge"
+            width={642}
+            height={431}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-auto"
+          />
         </div>
       </div>
     </Section>

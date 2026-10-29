@@ -9,12 +9,12 @@ interface HeaderMenuProps {
 
 const HeaderMenu = ({ color, menu }: HeaderMenuProps) => {
   const colorOptions: Record<TextColorType, string> = {
-    primary: "hover:text-gray-500/75 text-white",
+    primary: "hover:text-secondary text-white",
   };
 
   return (
     <div className="hidden md:block ml-auto">
-      <nav aria-label="Global">
+      <nav aria-label="Navigation principale">
         <ul className="flex items-center gap-12 text-sm">
           {menu.map((item, index) => (
             <li key={`${item.name}-${index}`}>

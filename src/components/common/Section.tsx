@@ -21,7 +21,7 @@ const Section = ({
 }: SectionProps) => {
   const bgcolors: Record<ColorVariants, string> = {
     dark: "bg-gray-900",
-    white: "white",
+    white: "bg-white",
     lightgray: "bg-[#F9FAFB]",
   };
 
