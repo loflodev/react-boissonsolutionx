@@ -1,6 +1,7 @@
 interface HeroProps {
   heroData: HeroSection | undefined;
 }
+import DOMPurify from "dompurify";
 import { useNavigate } from "react-router-dom";
 import Button from "../common/Button";
 import type { HeroSection } from "../../type";
@@ -56,12 +57,14 @@ const Hero = ({ heroData }: HeroProps) => {
               </p> */}
               {/* <div>{heroData?.description}</div> */}
 
-              <div
-                className="text-shadow "
-                dangerouslySetInnerHTML={{
-                  __html: `${heroData?.description}`,
-                }}
-              />
+              {heroData?.description && (
+                <div
+                  className="text-shadow "
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(heroData.description),
+                  }}
+                />
+              )}
 
               <Button
                 label="Découvrez Nos Produits"
