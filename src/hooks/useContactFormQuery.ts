@@ -7,6 +7,10 @@ import {
   type ContactFormResponse,
 } from "../type";
 import { useMutation } from "@tanstack/react-query";
+import {
+  validateContactForm,
+  type FormErrors,
+} from "../helpers/validateContactForm";
 
 interface FormData {
   fullName: string;
@@ -22,11 +26,6 @@ const EMPTY_FORM: FormData = {
   website: "",
 };
 
-interface FormErrors {
-  fullName?: string;
-  email?: string;
-  message?: string;
-}
 const useContactFormQuery = () => {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -67,24 +66,7 @@ const useContactFormQuery = () => {
   });
 
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Nom complet requis";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Courriel requis";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Adresse courriel invalide";
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = "Message requis";
-    } else if (formData.message.trim().length < 10) {
-      newErrors.message = "Le message doit contenir au moins 10 caractères";
-    }
-
+    const newErrors = validateContactForm(formData);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
