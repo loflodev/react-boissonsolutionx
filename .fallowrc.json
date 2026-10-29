@@ -1,0 +1,18 @@
+{
+  // This file is JSONC: fallow reads these comments; generic JSON tools may not.
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "entry": [
+    "src/index.{ts,tsx,js,jsx}",
+    "src/main.{ts,tsx,js,jsx}"
+  ],
+  "duplicates": {
+    // Small app: report every duplicate pair
+    "minOccurrences": 2
+  },
+  "rules": {
+    "unused-dependencies": "error",
+    // No architecture zones or rule packs in this single-page app
+    "boundary-violation": "off",
+    "policy-violation": "off"
+  }
+}
