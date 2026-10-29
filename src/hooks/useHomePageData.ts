@@ -15,9 +15,11 @@ interface UseHomePageDataReturn {
   isSuccess: boolean;
 }
 
+export const HOME_PAGE_QUERY_KEY = ["homePage"];
+
 const useHomePageData = (): UseHomePageDataReturn => {
   const { status, data, error, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["homePage"],
+    queryKey: HOME_PAGE_QUERY_KEY,
     queryFn: () => getHomePageData(HOME_PAGE_QUERY),
     retry: (failureCount, error) => {
       // Don't retry on validation errors
