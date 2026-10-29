@@ -75,18 +75,13 @@ export interface ContactFormData {
   fullName: string;
   email: string;
   message: string;
+  website?: string;
 }
 
 export interface ContactFormResponse {
   data?: {
     createContactMessage: {
       clientMutationId: string;
-      contactMessage: {
-        id: string;
-        title: string;
-        content: string;
-        status: string;
-      };
     };
   };
   errors?: GraphQLError[];

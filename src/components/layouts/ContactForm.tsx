@@ -68,6 +68,18 @@ const ContactForm = () => {
           )}
         </label>
 
+        {/* Honeypot: hidden from people, filled by bots */}
+        <input
+          type="text"
+          name="website"
+          value={formData.website}
+          onChange={handleInputChange}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="hidden"
+        />
+
         <Button
           type="submit"
           disabled={isSubmitting}

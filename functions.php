@@ -1,5 +1,45 @@
 <?php
 // Functions.php
+
+// Private storage for contact form submissions (never shown on the public site).
+add_action('init', function () {
+    register_post_type('contact_message', [
+        'label' => 'Contact messages',
+        'public' => false,
+        'show_ui' => true,
+        'show_in_rest' => false,
+        'exclude_from_search' => true,
+        'publicly_queryable' => false,
+        'supports' => ['title', 'editor', 'custom-fields'],
+        'menu_icon' => 'dashicons-email',
+    ]);
+});
+
+// One-time migration: older submissions were saved as public posts.
+add_action('admin_init', function () {
+    if (get_option('contact_messages_migrated')) {
+        return;
+    }
+
+    $legacy = get_posts([
+        'post_type' => 'post',
+        'post_status' => 'any',
+        'posts_per_page' => -1,
+        'fields' => 'ids',
+        'meta_key' => '_contact_form_submission',
+    ]);
+
+    foreach ($legacy as $post_id) {
+        wp_update_post([
+            'ID' => $post_id,
+            'post_type' => 'contact_message',
+            'post_status' => 'private',
+        ]);
+    }
+
+    update_option('contact_messages_migrated', 1);
+});
+
 add_action('graphql_register_types', function () {
 
     register_graphql_object_type('ContactMessage', [
@@ -65,7 +105,11 @@ add_action('graphql_register_types', function () {
             ],
             'status' => [
                 'type' => 'String',
-                'description' => 'The status of the contact message',
+                'description' => 'Ignored. Messages are always stored as private.',
+            ],
+            'website' => [
+                'type' => 'String',
+                'description' => 'Honeypot field. Must stay empty.',
             ],
         ],
         'outputFields' => [
@@ -80,7 +124,7 @@ add_action('graphql_register_types', function () {
                 'type' => 'ContactMessage',
                 'description' => 'The contact message that was created',
                 'resolve' => function($payload) {
-                    return \WPGraphQL\Data\DataSource::resolve_post_object($payload['id'], $payload['context']);
+                    return !empty($payload['id']) ? get_post($payload['id']) : null;
                 }
             ],
         ],
@@ -90,15 +134,30 @@ add_action('graphql_register_types', function () {
                 throw new \GraphQL\Error\UserError('The title and content fields are required.');
             }
 
-            // Set default status if not provided
-            $status = !empty($input['status']) ? sanitize_text_field($input['status']) : 'publish';
-            
-            // Create a post to store the submission
+            // Honeypot: bots fill every field. Pretend success, store nothing.
+            if (!empty($input['website'])) {
+                return [
+                    'id' => 0,
+                    'clientMutationId' => $input['clientMutationId'] ?? null,
+                    'context' => $context,
+                ];
+            }
+
+            // Rate limit: 5 submissions per 10 minutes per IP
+            $ip = sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+            $rate_key = 'contact_rate_' . md5($ip);
+            $attempts = (int) get_transient($rate_key);
+            if ($attempts >= 5) {
+                throw new \GraphQL\Error\UserError('Too many messages. Please try again later.');
+            }
+            set_transient($rate_key, $attempts + 1, 10 * MINUTE_IN_SECONDS);
+
+            // Store the submission privately; the client never chooses the status
             $post_args = [
-                'post_type' => 'post', // Using standard post type for compatibility
+                'post_type' => 'contact_message',
                 'post_title' => sanitize_text_field($input['title']),
                 'post_content' => wp_kses_post($input['content']),
-                'post_status' => $status,
+                'post_status' => 'private',
             ];
             
             // Insert the post
@@ -177,7 +236,7 @@ add_action('graphql_register_types', function () {
             // Return the payload
             return [
                 'id' => $post_id,
-                'clientMutationId' => $input['clientMutationId'],
+                'clientMutationId' => $input['clientMutationId'] ?? null,
                 'context' => $context,
             ];
         }

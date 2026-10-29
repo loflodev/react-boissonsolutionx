@@ -12,7 +12,15 @@ interface FormData {
   fullName: string;
   email: string;
   message: string;
+  website: string;
 }
+
+const EMPTY_FORM: FormData = {
+  fullName: "",
+  email: "",
+  message: "",
+  website: "",
+};
 
 interface FormErrors {
   fullName?: string;
@@ -20,11 +28,7 @@ interface FormErrors {
   message?: string;
 }
 const useContactFormQuery = () => {
-  const [formData, setFormData] = useState<FormData>({
-    fullName: "",
-    email: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
@@ -38,7 +42,7 @@ const useContactFormQuery = () => {
       if (result.data && result.data.createContactMessage && !result.errors) {
         setSubmitStatus("success");
         setSubmitMessage("Merci, envoyé !");
-        setFormData({ fullName: "", email: "", message: "" });
+        setFormData(EMPTY_FORM);
         setErrors({});
       } else {
         setSubmitStatus("error");
@@ -138,7 +142,7 @@ const useContactFormQuery = () => {
     handleInputChange,
     handleSubmit,
     resetForm: () => {
-      setFormData({ fullName: "", email: "", message: "" });
+      setFormData(EMPTY_FORM);
       setErrors({});
       setSubmitStatus("idle");
       setSubmitMessage("");

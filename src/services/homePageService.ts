@@ -106,7 +106,7 @@ export const submitContactForm = async (
           clientMutationId: "contact-form-submission",
           title: `Contact from ${formData.fullName}`,
           content: `Name: ${formData.fullName}\nEmail: ${formData.email}\nMessage: ${formData.message}`,
-          status: "publish",
+          website: formData.website ?? "",
         },
       },
     });
