@@ -13,7 +13,9 @@ concurrency:
 permissions:
   contents: read
 
-# The build prerenders the live WordPress content, like the Netlify build.
+# Actions are pinned to commit SHAs (tag in the comment); Lighthouse CI comes
+# from the lockfile. The build prerenders the live WordPress content, like the
+# Netlify build.
 # Override these in Settings > Secrets and variables > Actions > Variables.
 env:
   VITE_SITE_URL: ${{ vars.VITE_SITE_URL || 'https://boissonsolutionx.ca' }}
@@ -26,8 +28,10 @@ jobs:
     name: Lint, types and unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
           cache: npm
@@ -35,7 +39,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test:coverage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: coverage
@@ -46,8 +50,10 @@ jobs:
     name: Build, end-to-end and Lighthouse
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
           cache: npm
@@ -57,15 +63,15 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: End-to-end, SEO and accessibility (desktop + mobile)
         run: npm run test:e2e
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
       - name: Lighthouse budgets (mobile, 3 runs)
-        run: npx --yes @lhci/cli@0.15.x autorun
-      - uses: actions/upload-artifact@v4
+        run: npx --no-install lhci autorun
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
           name: lighthouse
@@ -76,12 +82,14 @@ jobs:
     name: WordPress functions.php (PHPUnit)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: "8.3"
           coverage: none
-          tools: composer:v2
+          tools: composer:2.11.0
       - name: Syntax check
         run: php -l functions.php
       - run: composer install --no-interaction --no-progress
