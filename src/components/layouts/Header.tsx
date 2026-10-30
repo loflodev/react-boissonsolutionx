@@ -28,11 +28,13 @@ const Header = () => {
   const activeId = useActiveSection(sectionIds);
   const activeLink = activeId ? `#${activeId}` : null;
   const hasScrolled = useHasScrolled();
+  // The open menu hangs from the bar, so the bar must be material too
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <header
       className="material-chrome fixed top-0 left-0 w-full z-50"
-      data-scrolled={hasScrolled}
+      data-scrolled={hasScrolled || isMenuOpen}
     >
       <a
         href="#main"
@@ -47,7 +49,7 @@ const Header = () => {
 
           <div className="flex items-center gap-3 ml-10">
             <Button label="Contact" variant="primary" size="sm" asLink to="#contactForm" />
-            <HamburgerMenu menu={menu} activeLink={activeLink} />
+            <HamburgerMenu menu={menu} activeLink={activeLink} onOpenChange={setIsMenuOpen} />
           </div>
         </div>
       </div>

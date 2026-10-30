@@ -34,7 +34,7 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
 
 // Feedback lives on the press: instant, and released the moment the pointer lifts
 const PRESS_CLASSES =
-  "transition-[scale,background-color,border-color] duration-150 ease-out active:scale-[0.97]";
+  "transition-[scale,background-color,border-color] duration-150 ease-out motion-safe:active:scale-[0.97]";
 
 // While loading the button is inert, so it gets no variant color or press feedback
 const LOADING_CLASSES = "bg-white/10 text-muted cursor-not-allowed";
@@ -67,7 +67,7 @@ const useFlashMessage = (
 const Arrow = () => (
   <ArrowRight
     aria-hidden="true"
-    className="size-4 transition-[translate] duration-200 ease-out group-hover:translate-x-0.5"
+    className="size-4 transition-[translate] duration-200 ease-out motion-safe:group-hover:translate-x-0.5"
   />
 );
 

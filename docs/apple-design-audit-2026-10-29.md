@@ -93,3 +93,33 @@ menu, the header material, typography, form feedback and consistency.
 
 - Springs, momentum, rubber-banding: there are no draggable or gesture-driven elements.
 - Sound/haptics: there's no meaningful moment for them on a marketing site.
+
+---
+
+## Re-audit after the premium redesign
+
+The "Dark cinematic" redesign (see `docs/design-system.md`) passed the motion, material and
+typography checks overall. These are the fixes it needed:
+
+- [x] **Reduced motion removed feedback too (§14).** The global `* { transition-duration: 0.01ms }`
+  rule also stripped color and opacity feedback, so reveals snapped instead of cross-fading.
+  It's replaced with targeted rules: movement (press scale, arrow nudge, card image zoom,
+  menu slide, reveal rise) uses `motion-safe:`, and under reduced motion the reveals are a
+  300 ms opacity cross-fade with no stagger. Loading spinners keep turning because they show
+  status.
+- [x] **Header now materializes instead of fading (§12).** The blur radius animates from 0 to 24 px
+  along with the tint, so the bar arrives as a material and not as an opacity fade.
+- [x] **The mobile menu came out of a clear bar (§7, §12).** At the top of the page the frosted
+  menu hung under a transparent header. The header now turns into a material while the menu
+  is open (`onOpenChange` → `data-scrolled`).
+- [x] **Vibrancy (§12, §15):** desktop nav text on the glass goes from cream/80 to cream/90 at
+  medium weight, and the negative tracking on that 14 px text is dropped (small text shouldn't
+  be tightened). Mobile menu links go to cream/90 as well.
+- [x] **Response (§1):** mobile menu links get a pressed background.
+- [x] **Bug, not a design issue:** the minifier (Lightning CSS) dropped the unprefixed
+  `backdrop-filter` because the `-webkit-` line came after it, so Firefox and Chromium got no
+  blur. The source now lists the prefixed line first. Verified in `dist` CSS.
+
+**WordPress content to fix (not code):** the Watermelon card reads "500L" (should be 500mL)
+and its ingredient list is copied from Hibiscus. Capitalization is also inconsistent across
+cards ("En Savoir plus", "Sans Colorant").

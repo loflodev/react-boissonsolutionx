@@ -25,7 +25,7 @@ const OurProduct = ({ products }: ProductCardProps) => {
               <article className="group/card flex w-full flex-col rounded-3xl border border-line bg-white/[0.03] p-2 transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.05]">
                 <div className="overflow-hidden rounded-2xl bg-ink">
                   <img
-                    className="aspect-square w-full object-cover transition-[scale] duration-500 ease-out group-hover/card:scale-[1.03]"
+                    className="aspect-square w-full object-cover transition-[scale] duration-500 ease-out motion-safe:group-hover/card:scale-[1.03]"
                     src={item.cover.node.sourceUrl}
                     alt={item.name}
                     width={item.cover.node.mediaDetails?.width}

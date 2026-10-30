@@ -34,7 +34,7 @@ const Footer = () => {
           </nav>
 
           <a
-            className="grid size-11 place-items-center rounded-full border border-white/15 bg-white/[0.04] text-cream transition-[scale,background-color] duration-150 ease-out hover:bg-white/[0.08] active:scale-[0.94]"
+            className="grid size-11 place-items-center rounded-full border border-white/15 bg-white/[0.04] text-cream transition-[scale,background-color] duration-150 ease-out hover:bg-white/[0.08] motion-safe:active:scale-[0.94]"
             href="#hero"
           >
             <span className="sr-only">Retour en haut</span>
