@@ -47,10 +47,24 @@ const mockGraphql = async (page: Page, homeData: unknown): Promise<GraphqlMock> 
   };
 };
 
+// A 1×1 transparent PNG; browsers sniff the format, whatever the URL's extension
+const PIXEL = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+  "base64"
+);
+
+// Serve WordPress media locally too: CI runners can't always reach the live
+// host (ERR_HTTP2_PROTOCOL_ERROR), which made the console check flaky
+const mockMedia = (page: Page) =>
+  page.route("**/wp-content/uploads/**", (route) =>
+    route.fulfill({ contentType: "image/png", body: PIXEL })
+  );
+
 // Auto fixture: every test is mocked, whether or not it reads `graphql`
 export const test = base.extend<{ graphql: GraphqlMock }>({
   graphql: [
     async ({ page, request }, use) => {
+      await mockMedia(page);
       await use(await mockGraphql(page, await loadHomeData(request)));
       await page.unrouteAll({ behavior: "ignoreErrors" });
     },
