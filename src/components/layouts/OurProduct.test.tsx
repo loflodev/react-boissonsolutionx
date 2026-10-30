@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { homePage, makeProduct } from "../../test/fixtures";
 import { convertToArray } from "../../helpers/utils";
 import OurProduct from "./OurProduct";
@@ -40,5 +40,13 @@ describe("OurProduct", () => {
       "#contactForm"
     );
     expect(within(card).getByText("500 mL")).toBeInTheDocument();
+  });
+
+  it("tells the page which product the visitor asked about", () => {
+    const onInquire = vi.fn();
+    render(<OurProduct products={products} onInquire={onInquire} />);
+    const card = screen.getAllByRole("article")[0];
+    within(card).getByRole("link", { name: "Commander" }).click();
+    expect(onInquire).toHaveBeenCalledWith("SolutionX Betterave");
   });
 });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SUBMIT_CONTACT_FORM_QUERY } from "../graphql/submitContactFormQuery";
 import { submitContactForm } from "../services/homePageService";
 import {
@@ -25,6 +25,9 @@ const EMPTY_FORM: FormData = {
   message: "",
   website: "",
 };
+
+// How long the "message sent" panel replaces the form before it comes back
+export const SUCCESS_PANEL_MS = 8000;
 
 const useContactFormQuery = () => {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
@@ -64,6 +67,15 @@ const useContactFormQuery = () => {
     // and a retry would send a duplicate message
     retry: false,
   });
+
+  useEffect(() => {
+    if (submitStatus !== "success") return;
+    const timer = setTimeout(() => {
+      setSubmitStatus("idle");
+      setSubmitMessage("");
+    }, SUCCESS_PANEL_MS);
+    return () => clearTimeout(timer);
+  }, [submitStatus]);
 
   const validateForm = (): boolean => {
     const newErrors = validateContactForm(formData);
@@ -121,6 +133,14 @@ const useContactFormQuery = () => {
     mutation.mutate(formData);
   };
 
+  // Fill the message from outside the form (a product card), leaving the other fields alone
+  const prefillMessage = (message: string) => {
+    setFormData((prev) => ({ ...prev, message }));
+    setErrors((prev) => ({ ...prev, message: undefined }));
+    setSubmitStatus("idle");
+    setSubmitMessage("");
+  };
+
   return {
     formData,
     errors,
@@ -132,6 +152,7 @@ const useContactFormQuery = () => {
     handleInputChange,
     handleBlur,
     handleSubmit,
+    prefillMessage,
     resetForm: () => {
       setFormData(EMPTY_FORM);
       setErrors({});

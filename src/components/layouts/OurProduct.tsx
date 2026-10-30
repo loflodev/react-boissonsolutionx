@@ -5,6 +5,8 @@ import type { ProductCard } from "../../type";
 
 interface ProductCardProps {
   products: ProductCard[];
+  // Called with the product's display name when a card CTA is clicked
+  onInquire?: (product: string) => void;
 }
 
 // WordPress names read "SolutionX - Betterave": show the flavor as the title
@@ -19,7 +21,7 @@ const splitName = (name: string) => {
 const CARD_IMAGE_SIZES =
   "(min-width: 1152px) 260px, (min-width: 1024px) 23vw, (min-width: 640px) 45vw, calc(100vw - 3rem)";
 
-const OurProduct = ({ products }: ProductCardProps) => {
+const OurProduct = ({ products, onInquire }: ProductCardProps) => {
   return (
     <Section eyebrow="01 — Nos produits" sectionTitle="Nos Produits" id="ourProducts">
       <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -55,7 +57,7 @@ const OurProduct = ({ products }: ProductCardProps) => {
                       {item.features.feature2}
                     </li>
                   </ul>
-                  {/* Every card CTA leads to the contact form */}
+                  {/* Every card CTA leads to the contact form, which it prefills with this product */}
                   <Button
                     label={item.button.label}
                     variant="secondary"
@@ -65,6 +67,7 @@ const OurProduct = ({ products }: ProductCardProps) => {
                     className="mt-auto"
                     asLink
                     to="#contactForm"
+                    onClick={() => onInquire?.(range ? `${range} ${flavor}` : flavor)}
                   />
                 </div>
               </article>

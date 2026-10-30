@@ -44,7 +44,7 @@ const Footer = () => {
 
         <p className="mt-12 border-t border-line pt-8 text-sm text-cream/60">
           Copyright &copy; {new Date().getFullYear()} Boisson SolutionX. Tous droits réservés. Développé par{" "}
-          <a className="underline underline-offset-4 hover:text-cream transition-colors" href="https://www.instagram.com/louis_thereborn" target="_blank" rel="noopener noreferrer">
+          <a className="underline underline-offset-4 hover:text-cream transition-colors" href="https://loflodev.com" target="_blank" rel="noopener">
             Louis Jr Florival
           </a>
         </p>

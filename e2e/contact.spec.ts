@@ -27,6 +27,9 @@ test("sends the message to WordPress and confirms", async ({ page, graphql }) =>
   await send(page);
 
   await expect(page.getByRole("status")).toHaveText("Merci, envoyé !");
+  await expect(page.getByRole("heading", { name: "Merci, message envoyé !" })).toBeFocused();
+
+  await page.getByRole("button", { name: "Envoyer un autre message" }).click();
   await expect(page.getByRole("textbox", { name: "Nom Complet *" })).toHaveValue("");
 
   expect(graphql.submissions).toHaveLength(1);
@@ -48,4 +51,13 @@ test("tells the visitor to retry when WordPress fails", async ({ page, graphql }
   await expect(page.getByRole("textbox", { name: "Nom Complet *" })).toHaveValue("Jean Tremblay");
   // No automatic retry: a slow request may have been saved already
   expect(graphql.submissions).toHaveLength(1);
+});
+
+test("a product card prefills the message with its flavor", async ({ page }) => {
+  await page.getByRole("article").filter({ hasText: "Betterave" }).getByRole("link").click();
+
+  await expect(page).toHaveURL(/#contactForm$/);
+  await expect(page.getByRole("textbox", { name: "Message *" })).toHaveValue(
+    "Bonjour, j'aimerais avoir plus d'informations sur SolutionX Betterave. "
+  );
 });

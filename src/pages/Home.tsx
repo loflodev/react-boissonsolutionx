@@ -1,6 +1,7 @@
+import { useState } from "react";
 import About from "../components/layouts/About";
 import Contact from "../components/layouts/Contact";
-import ContactForm from "../components/layouts/ContactForm";
+import ContactForm, { type Inquiry } from "../components/layouts/ContactForm";
 import Hero from "../components/layouts/Hero";
 import OurProduct from "../components/layouts/OurProduct";
 import Button from "../components/common/Button";
@@ -28,6 +29,8 @@ const LoadError = () => (
 
 const Home = () => {
   const { products, heroData, isLoading, isError } = useHomePageData();
+  // A product card clicked on its way to the contact form
+  const [inquiry, setInquiry] = useState<Inquiry | null>(null);
 
   // Static sections always render; only the WordPress-driven ones wait on data
   const renderCmsSections = () => {
@@ -36,7 +39,10 @@ const Home = () => {
     return (
       <>
         <Hero heroData={heroData} />
-        <OurProduct products={products} />
+        <OurProduct
+          products={products}
+          onInquire={(product) => setInquiry({ product, at: Date.now() })}
+        />
       </>
     );
   };
@@ -46,7 +52,7 @@ const Home = () => {
       {renderCmsSections()}
       <About />
       <Contact />
-      <ContactForm />
+      <ContactForm inquiry={inquiry} />
     </>
   );
 };

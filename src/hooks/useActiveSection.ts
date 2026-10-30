@@ -7,11 +7,8 @@ const useActiveSection = (ids: string[]) => {
   const idsKey = ids.join(",");
 
   useEffect(() => {
-    const sections = idsKey
-      .split(",")
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
-    if (sections.length === 0) return;
+    const ids = idsKey.split(",");
+    const observed = new Set<string>();
 
     // A thin band just below the header: whichever section crosses it is current
     const observer = new IntersectionObserver(
@@ -21,8 +18,26 @@ const useActiveSection = (ids: string[]) => {
       },
       { rootMargin: "-30% 0px -65% 0px" }
     );
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
+
+    // CMS sections (hero, products) mount only once WordPress data arrives,
+    // after this effect, so keep looking until every section has been found
+    const observeNew = () => {
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el || observed.has(id)) return;
+        observed.add(id);
+        observer.observe(el);
+      });
+      if (observed.size === ids.length) mutations.disconnect();
+    };
+    const mutations = new MutationObserver(observeNew);
+    mutations.observe(document.body, { childList: true, subtree: true });
+    observeNew();
+
+    return () => {
+      mutations.disconnect();
+      observer.disconnect();
+    };
   }, [idsKey]);
 
   return activeId;

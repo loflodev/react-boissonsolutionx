@@ -55,4 +55,23 @@ describe("Header", () => {
     );
     section.remove();
   });
+
+  it("also tracks sections that mount after it, like the CMS-driven hero", async () => {
+    render(<Header />);
+
+    // WordPress data arrives later: the hero only now joins the page
+    const hero = document.createElement("section");
+    hero.id = "hero";
+    await act(async () => {
+      document.body.appendChild(hero);
+    });
+    act(() => MockIntersectionObserver.enter(hero));
+
+    const nav = screen.getByRole("navigation", { name: "Navigation principale" });
+    expect(within(nav).getByRole("link", { name: "Accueil" })).toHaveAttribute(
+      "aria-current",
+      "true"
+    );
+    hero.remove();
+  });
 });

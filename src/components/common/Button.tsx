@@ -139,7 +139,11 @@ const Button = ({
   // crawlable and keyboard-native
   if (asLink && to) {
     return (
-      <a href={to} className={buttonClasses}>
+      <a
+        href={to}
+        className={buttonClasses}
+        onClick={buttonProps.onClick as React.MouseEventHandler<HTMLAnchorElement> | undefined}
+      >
         {label}
         {withArrow && <Arrow />}
       </a>
