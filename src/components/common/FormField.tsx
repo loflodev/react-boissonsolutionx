@@ -40,20 +40,24 @@ const FormField = ({
     "aria-describedby": error ? errorId : undefined,
   };
 
+  // The error sits outside the <label> so it describes the field
+  // (aria-describedby) without also becoming part of its name
   return (
-    <label htmlFor={name} className="flex flex-col gap-2 text-sm font-medium tracking-tight text-cream/90">
-      {label}
+    <div className="flex flex-col gap-2">
+      <label htmlFor={name} className="text-sm font-medium tracking-tight text-cream/90">
+        {label}
+      </label>
       {multiline ? (
         <textarea {...fieldProps} />
       ) : (
         <input type={type} {...fieldProps} />
       )}
       {error && (
-        <p id={errorId} className="text-sm font-normal text-red-300">
+        <p id={errorId} className="text-sm text-red-300">
           {error}
         </p>
       )}
-    </label>
+    </div>
   );
 };
 

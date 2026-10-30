@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# The build prerenders the live WordPress content, like the Netlify build.
+# Override these in Settings > Secrets and variables > Actions > Variables.
+env:
+  VITE_SITE_URL: ${{ vars.VITE_SITE_URL || 'https://boissonsolutionx.ca' }}
+  VITE_WP_DOMAIN: ${{ vars.VITE_WP_DOMAIN || 'https://api.boissonsolutionx.ca' }}
+  VITE_WP_GRAPHQL_ENDPOINT: ${{ vars.VITE_WP_GRAPHQL_ENDPOINT || '/graphql' }}
+  VITE_CONTACT_FORM_ID: ${{ vars.VITE_CONTACT_FORM_ID }}
+
+jobs:
+  frontend:
+    name: Lint, types and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+
+  e2e:
+    name: Build, end-to-end and Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build (prerenders WordPress content)
+        run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: End-to-end, SEO and accessibility (desktop + mobile)
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+      - name: Lighthouse budgets (mobile, 3 runs)
+        run: npx --yes @lhci/cli@0.15.x autorun
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse
+          path: .lighthouseci/reports/
+          retention-days: 7
+
+  backend:
+    name: WordPress functions.php (PHPUnit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer:v2
+      - name: Syntax check
+        run: php -l functions.php
+      - run: composer install --no-interaction --no-progress
+      - run: composer test

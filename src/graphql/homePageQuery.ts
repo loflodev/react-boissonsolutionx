@@ -1,4 +1,19 @@
+// Every card cover needs the same fields, including the WordPress-generated
+// srcSet so phones don't download the 1024px original
+const CARD_COVER_FRAGMENT = `
+  fragment CardCover on MediaItem {
+    link
+    sourceUrl
+    srcSet
+    mediaDetails {
+      width
+      height
+    }
+  }
+`;
+
 export const HOME_PAGE_QUERY = `
+  ${CARD_COVER_FRAGMENT}
   query {
     page(id: "home", idType: URI) {
       heroSection {
@@ -24,12 +39,7 @@ export const HOME_PAGE_QUERY = `
       card1 {
         cover {
           node {
-            link
-            sourceUrl
-            mediaDetails {
-              width
-              height
-            }
+            ...CardCover
           }
         }
         name
@@ -49,12 +59,7 @@ export const HOME_PAGE_QUERY = `
       card2 {
         cover {
           node {
-            link
-            sourceUrl
-            mediaDetails {
-              width
-              height
-            }
+            ...CardCover
           }
         }
         name
@@ -74,12 +79,7 @@ export const HOME_PAGE_QUERY = `
       card3 {
         cover {
           node {
-            link
-            sourceUrl
-            mediaDetails {
-              width
-              height
-            }
+            ...CardCover
           }
         }
         name
@@ -99,12 +99,7 @@ export const HOME_PAGE_QUERY = `
       card4 {
         cover {
           node {
-            link
-            sourceUrl
-            mediaDetails {
-              width
-              height
-            }
+            ...CardCover
           }
         }
         name

@@ -5,6 +5,7 @@ export interface Menu {
 export interface ImageNode {
   link: string;
   sourceUrl?: string;
+  srcSet?: string | null;
   mediaDetails?: {
     width: number;
     height: number;

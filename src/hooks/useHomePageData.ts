@@ -41,7 +41,9 @@ const useHomePageData = (): UseHomePageDataReturn => {
     products,
     heroData,
     isLoading,
-    isError,
+    // A failed background refresh keeps the content already shown (from the
+    // prerender or an earlier fetch); only a page with nothing to show errors
+    isError: isError && !data,
     isSuccess,
   };
 };

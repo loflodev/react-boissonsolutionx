@@ -17,10 +17,16 @@ const Hero = ({ heroData }: HeroProps) => {
       id="hero"
     >
       {/* Scrims: the bottles sit left, so the text side darkens on desktop;
-          on mobile the copy sits under the bottles, so it darkens from below */}
+          on mobile the copy sits under the bottles, so it darkens from below
+          (strong enough at 60% for the small eyebrow over the orange bottle) */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-t from-ink from-35% via-ink/75 to-ink/10 lg:bg-gradient-to-l lg:from-ink lg:from-30% lg:via-ink/80 lg:via-50% lg:to-transparent lg:to-75%"
+        className="absolute inset-0 -z-10 bg-gradient-to-t from-ink from-35% via-ink/90 via-60% to-ink/10 lg:bg-gradient-to-l lg:from-ink lg:from-30% lg:via-ink/80 lg:via-50% lg:to-transparent lg:to-75%"
+      ></div>
+      {/* The header is clear over the hero: keep its links off the splashes */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 -z-10 h-32 bg-gradient-to-b from-ink/85 to-transparent"
       ></div>
       <div
         aria-hidden="true"

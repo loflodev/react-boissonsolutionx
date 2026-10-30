@@ -14,6 +14,11 @@ const splitName = (name: string) => {
   return rest.length ? { range, flavor: rest.join(" - ") } : { range: null, flavor: name };
 };
 
+// Rendered card width: 4 columns inside the 72rem container on desktop,
+// 2 columns from sm, full width (minus the page gutter) on phones
+const CARD_IMAGE_SIZES =
+  "(min-width: 1152px) 260px, (min-width: 1024px) 23vw, (min-width: 640px) 45vw, calc(100vw - 3rem)";
+
 const OurProduct = ({ products }: ProductCardProps) => {
   return (
     <Section eyebrow="01 — Nos produits" sectionTitle="Nos Produits" id="ourProducts">
@@ -27,6 +32,8 @@ const OurProduct = ({ products }: ProductCardProps) => {
                   <img
                     className="aspect-square w-full object-cover transition-[scale] duration-500 ease-out motion-safe:group-hover/card:scale-[1.03]"
                     src={item.cover.node.sourceUrl}
+                    srcSet={item.cover.node.srcSet ?? undefined}
+                    sizes={CARD_IMAGE_SIZES}
                     alt={item.name}
                     width={item.cover.node.mediaDetails?.width}
                     height={item.cover.node.mediaDetails?.height}

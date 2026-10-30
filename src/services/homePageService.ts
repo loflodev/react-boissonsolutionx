@@ -5,6 +5,7 @@ import {
   ValidationError,
   type ContactFormData,
   type ContactFormResponse,
+  type GraphQLError,
   type HomePageDataResponse,
   type Page,
 } from "../type";
@@ -50,6 +51,21 @@ const toServiceError = (error: unknown): Error => {
   );
 };
 
+// Throw when a GraphQL response carries errors
+const assertNoGraphQLErrors = (
+  errors: GraphQLError[] | undefined,
+  status: number
+): void => {
+  if (errors && errors.length > 0) {
+    const errorMessage = errors.map((error) => error.message).join("; ");
+    throw new GraphQLServiceError(
+      `GraphQL errors: ${errorMessage}`,
+      errors,
+      status
+    );
+  }
+};
+
 export const getHomePageData = async (
   query: string
 ): Promise<{ page: Page }> => {
@@ -65,17 +81,7 @@ export const getHomePageData = async (
       }
     );
 
-    if (response.data.errors && response.data.errors.length > 0) {
-      const errorMessage = response.data.errors
-        .map((error) => error.message)
-        .join("; ");
-
-      throw new GraphQLServiceError(
-        `GraphQL errors: ${errorMessage}`,
-        response.data.errors,
-        response.status
-      );
-    }
+    assertNoGraphQLErrors(response.data.errors, response.status);
 
     // Check if data exists
     if (!response.data.data) {
@@ -119,17 +125,7 @@ export const submitContactForm = async (
       },
     });
 
-    if (response.data.errors && response.data.errors.length > 0) {
-      const errorMessage = response.data.errors
-        .map((error) => error.message)
-        .join("; ");
-
-      throw new GraphQLServiceError(
-        `GraphQL errors: ${errorMessage}`,
-        response.data.errors,
-        response.status
-      );
-    }
+    assertNoGraphQLErrors(response.data.errors, response.status);
     return response.data;
   } catch (error) {
     throw toServiceError(error);

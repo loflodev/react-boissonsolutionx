@@ -77,8 +77,7 @@ The project includes custom GraphQL types and mutations for handling form submis
 
 ### Available Queries & Mutations
 
-- `createContactMessage`: Submit a new contact form
-- `createSubmission`: Alternative submission endpoint with ACF integration
+- `createContactMessage`: Submit a new contact form. Saves it as a private `contact_message` post and emails it through Contact Form 7
 
 ## 📦 Building for Production
 

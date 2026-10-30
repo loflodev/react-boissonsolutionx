@@ -185,8 +185,9 @@ add_action('graphql_register_types', function () {
                 'post_status' => 'private',
             ];
             
-            // Insert the post
-            $post_id = wp_insert_post($post_args);
+            // Insert the post. Without `true`, a failure returns 0 instead of a
+            // WP_Error and would be reported to the visitor as a success
+            $post_id = wp_insert_post($post_args, true);
             
             if (is_wp_error($post_id)) {
                 throw new \GraphQL\Error\UserError($post_id->get_error_message());
@@ -265,86 +266,6 @@ add_action('graphql_register_types', function () {
                 'id' => $post_id,
                 'clientMutationId' => $input['clientMutationId'] ?? null,
                 'context' => $context,
-            ];
-        }
-    ]);
-
-    register_graphql_mutation('createSubmission', [
-        'inputFields' => [
-            'fullName' => [
-                'type' => 'String',
-                'description' => 'User Full Name',
-            ],
-            'email' => [
-                'type' => 'String',
-                'description' => 'User Email',
-            ],
-            'message' => [
-                'type' => 'String',
-                'description' => 'User Message',
-            ],
-        ],
-        'outputFields' => [
-            'success' => [
-                'type' => 'Boolean',
-                'description' => 'Whether or not data was stored successfully',
-                'resolve' => function ($payload, $args, $context, $info) {
-                    return isset($payload['success']) ? $payload['success'] : null;
-                }
-            ],
-            'data' => [
-                'type' => 'String',
-                'description' => 'Payload of submitted fields',
-                'resolve' => function ($payload, $args, $context, $info) {
-                    return isset($payload['data']) ? $payload['data'] : null;
-                }
-            ]
-        ],
-        'mutateAndGetPayload' => function ($input, $context, $info) {
-
-            if (!class_exists('ACF')) return [
-                'success' => false,
-                'data' => 'ACF is not installed'
-            ];
-
-            $sanitized_data = [];
-            $errors = [];
-            $acceptable_fields = [
-                'fullName' => 'field_688f812fcee10',
-                'email' => 'field_688f8161cee11',
-                'message' => 'field_688f8172cee12',
-            ];
-
-            foreach ($acceptable_fields as $field_key => $acf_key) {
-                if (!empty($input[$field_key])) {
-                    $sanitized_data[$field_key] = sanitize_text_field($input[$field_key]);
-                } else {
-                    $errors[] = $field_key . ' was not filled out.';
-                }
-            }
-
-            if (!empty($errors)) return [
-                'success' => false,
-                'data' => $errors
-            ];
-
-            $form_submission = wp_insert_post([
-                'post_type' => 'form_submission',
-                'post_title' => $sanitized_data['fullName'],
-            ], true);
-
-            if (is_wp_error($form_submission)) return [
-                'success' => false,
-                'data' => $form_submission->get_error_message()
-            ];
-
-            foreach ($acceptable_fields as $field_key => $acf_key) {
-                update_field($acf_key, $sanitized_data[$field_key], $form_submission);
-            }
-
-            return [
-                'success' => true,
-                'data' => json_encode($sanitized_data)
             ];
         }
     ]);
