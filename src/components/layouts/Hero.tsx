@@ -13,65 +13,56 @@ const sanitize = (html: string) =>
 const Hero = ({ heroData }: HeroProps) => {
   return (
     <section
-      className="w-full bg-cover bg-center bg-no-repeat relative overflow-hidden bg-[url(/bottles.webp)]"
+      className="relative isolate w-full min-h-svh overflow-hidden bg-ink bg-[url(/bottles.webp)] bg-cover bg-[position:30%_top] lg:bg-left bg-no-repeat"
       id="hero"
     >
+      {/* Scrims: the bottles sit left, so the text side darkens on desktop;
+          on mobile the copy sits under the bottles, so it darkens from below */}
       <div
         aria-hidden="true"
-        className="absolute lg:hidden block inset-0 bg-black opacity-70 mt-20"
+        className="absolute inset-0 -z-10 bg-gradient-to-t from-ink from-35% via-ink/75 to-ink/10 lg:bg-gradient-to-l lg:from-ink lg:from-30% lg:via-ink/80 lg:via-50% lg:to-transparent lg:to-75%"
       ></div>
-      {/* Main content */}
-      <div className="min-h-screen relative z-10 flex items-center">
-        <div className="container mx-auto px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left side - Bottles */}
-            <div aria-hidden="true" className="flex justify-center lg:justify-start">
-              <div className="relative">
-                {/* Splash effects */}
-                <div className="absolute -top-10 -left-10 w-32 h-32 opacity-30 bg-gradient-to-br from-blue-400 to-transparent rounded-full blur-xl"></div>
-                <div className="absolute top-20 -right-8 w-24 h-24 opacity-40 bg-gradient-to-br from-orange-400 to-transparent rounded-full blur-lg"></div>
-              </div>
-            </div>
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-ink to-transparent"
+      ></div>
 
-            {/* Right side - Text content */}
-            <div className="text-white space-y-6 lg:pl-8">
-              <div className="space-y-2">
-                <p className="text-red-500 text-2xl lg:text-3xl font-bold tracking-tight">
-                  {heroData?.title}
-                </p>
-                <h1 className="text-white text-4xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-balance">
-                  {heroData?.subtitle}
-                </h1>
-              </div>
+      <div className="mx-auto flex min-h-svh max-w-6xl items-end lg:items-center px-6 md:px-10 pt-32 pb-20 lg:py-0">
+        <div className="w-full lg:w-1/2 lg:ml-auto space-y-8">
+          <div className="space-y-4">
+            <p className="eyebrow">{heroData?.title}</p>
+            <h1 className="display text-cream text-[clamp(3.25rem,8vw,6.5rem)]">
+              {heroData?.subtitle}
+            </h1>
+          </div>
 
-              {heroData?.description && (
-                <div
-                  className="text-shadow "
-                  dangerouslySetInnerHTML={{
-                    __html: sanitize(heroData.description),
-                  }}
-                />
-              )}
+          {heroData?.description && (
+            <div
+              className="max-w-prose text-muted text-lg leading-relaxed"
+              dangerouslySetInnerHTML={{
+                __html: sanitize(heroData.description),
+              }}
+            />
+          )}
 
-              <Button
-                label="Découvrez Nos Produits"
-                variant="secondary"
-                fitContent={false}
-                btnSize="2"
-                btnClass="text-lg font-bold"
-                asLink
-                to="#ourProducts"
-              />
-            </div>
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Button
+              label="Découvrez nos produits"
+              variant="primary"
+              size="lg"
+              withArrow
+              asLink
+              to="#ourProducts"
+            />
+            <Button
+              label="Où acheter"
+              variant="secondary"
+              size="lg"
+              asLink
+              to="#contact"
+            />
           </div>
         </div>
-      </div>
-
-      {/* Additional decorative elements (static: looping motion here has no purpose) */}
-      <div aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-orange-400 rounded-full opacity-60"></div>
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-blue-400 rounded-full opacity-80"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-3 h-3 bg-red-400 rounded-full opacity-40"></div>
       </div>
     </section>
   );

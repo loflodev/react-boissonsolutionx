@@ -1,50 +1,51 @@
 import type { ReactNode, Ref } from "react";
+import Reveal from "./Reveal";
 
-type ColorVariants = "dark" | "white" | "lightgray";
+type SectionTone = "base" | "raised";
 
 interface SectionProps {
   children: ReactNode;
-  backgroundColor: ColorVariants;
+  tone?: SectionTone;
+  eyebrow?: string;
   sectionTitle?: string;
-  fullVh?: boolean;
+  // Decorative background layers (see Decor.tsx), drawn behind the content
+  decor?: ReactNode;
   id?: string;
   ref?: Ref<HTMLElement>;
 }
 
+// Alternating ink tones give the page rhythm without breaking the dark mood
+const TONE_CLASSES: Record<SectionTone, string> = {
+  base: "bg-ink",
+  raised: "bg-ink-raised",
+};
+
 const Section = ({
   children,
+  tone = "base",
+  eyebrow,
   sectionTitle,
-  backgroundColor,
-  fullVh = false,
+  decor,
   id,
   ref,
 }: SectionProps) => {
-  const bgcolors: Record<ColorVariants, string> = {
-    dark: "bg-gray-900",
-    white: "bg-white",
-    lightgray: "bg-[#F9FAFB]",
-  };
-
-  const secTitleColors: Record<ColorVariants, string> = {
-    dark: "text-white",
-    white: "text-[#000]",
-    lightgray: "text-[#000]",
-  };
-
-  const hScreen = fullVh ? "h-screen" : "";
   return (
     <section
-      className={`flex items-center md:px-30 px-4 md:py-42 py-16 ${bgcolors[backgroundColor]} ${hScreen}`}
+      className={`relative isolate overflow-hidden border-t border-line py-24 md:py-36 ${TONE_CLASSES[tone]}`}
       id={id}
       ref={ref}
     >
-      <div className="grow">
-        {sectionTitle && (
-          <h2
-            className={`${secTitleColors[backgroundColor]} text-2xl lg:text-3xl font-bold tracking-tight text-balance text-center mb-22`}
-          >
-            {sectionTitle}
-          </h2>
+      {decor && <div className="absolute inset-0 -z-10">{decor}</div>}
+      <div className="mx-auto max-w-6xl px-6 md:px-10">
+        {(eyebrow || sectionTitle) && (
+          <Reveal className="mb-14 md:mb-20 max-w-3xl">
+            {eyebrow && <p className="eyebrow mb-5">{eyebrow}</p>}
+            {sectionTitle && (
+              <h2 className="display text-cream text-[clamp(2.25rem,4.5vw,3.5rem)]">
+                {sectionTitle}
+              </h2>
+            )}
+          </Reveal>
         )}
         {children}
       </div>

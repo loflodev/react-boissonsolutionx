@@ -3,27 +3,25 @@ import Contact from "../components/layouts/Contact";
 import ContactForm from "../components/layouts/ContactForm";
 import Hero from "../components/layouts/Hero";
 import OurProduct from "../components/layouts/OurProduct";
+import Button from "../components/common/Button";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import useHomePageData from "../hooks/useHomePageData";
 
 const LoadError = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100">
+  <div className="min-h-svh flex items-center justify-center bg-ink px-6">
     <div
       role="alert"
-      className="text-center p-6 max-w-md mx-auto bg-white rounded-xl shadow-md"
+      className="text-center p-10 max-w-md mx-auto rounded-3xl border border-line bg-white/[0.03]"
     >
-      <h2 className="text-2xl font-bold text-red-700 mb-4">
-        Erreur de chargement
-      </h2>
-      <p className="text-gray-700 mb-4">
+      <h2 className="display text-cream text-3xl mb-4">Erreur de chargement</h2>
+      <p className="text-muted mb-8">
         Désolé, une erreur est survenue lors du chargement des données.
       </p>
-      <button
+      <Button
+        label="Réessayer"
+        variant="primary"
         onClick={() => window.location.reload()}
-        className="cursor-pointer px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 active:bg-red-900 active:scale-[0.97] transition-[scale,background-color] duration-100 ease-out"
-      >
-        Réessayer
-      </button>
+      />
     </div>
   </div>
 );

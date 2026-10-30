@@ -1,5 +1,6 @@
 import { createRoot, hydrateRoot } from "react-dom/client";
 import "@fontsource-variable/inter/opsz.css";
+import "@fontsource-variable/playfair-display";
 import "./index.css";
 import App from "./App.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -29,6 +30,9 @@ const app = (
     </QueryClientProvider>
   </StrictMode>
 );
+
+// Opt in to scroll reveals only now that JS is running (see index.css)
+document.documentElement.classList.add("js-reveal");
 
 const container = document.getElementById("root")!;
 

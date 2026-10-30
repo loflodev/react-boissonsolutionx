@@ -1,5 +1,6 @@
 import useContactFormQuery from "../../hooks/useContactFormQuery";
 import Button from "../common/Button";
+import { Glow, Grain, Rings } from "../common/Decor";
 import FormField from "../common/FormField";
 import Section from "../common/Section";
 
@@ -17,14 +18,23 @@ const ContactForm = () => {
 
   return (
     <Section
-      backgroundColor="dark"
+      tone="raised"
+      eyebrow="04 — Nous contacter"
       sectionTitle="Nous Contacter"
       id="contactForm"
+      decor={
+        <>
+          <Glow color="secondary" className="right-[5%] top-1/3 size-[30rem]" />
+          {/* Rings fill the empty side of the form; on phones there is none, so they stay hidden */}
+          <Rings className="hidden md:block top-1/2 -translate-y-1/2 w-[56rem] md:right-[-22rem] lg:right-[-4rem]" />
+          <Grain />
+        </>
+      }
     >
       <form
         noValidate
         onSubmit={handleSubmit}
-        className="flex flex-col gap-6 m-auto lg:max-w-[65%] text-white"
+        className="flex flex-col gap-6 max-w-2xl rounded-3xl border border-line bg-white/[0.02] p-6 md:p-10"
       >
         <FormField
           name="fullName"
@@ -51,7 +61,7 @@ const ContactForm = () => {
           name="message"
           label="Message *"
           multiline
-          fieldClass="h-50 mb-6"
+          fieldClass="h-44 resize-y"
           value={formData.message}
           error={errors.message}
           onChange={handleInputChange}
@@ -75,7 +85,11 @@ const ContactForm = () => {
           disabled={isSubmitting}
           asLink={false}
           label="Envoyer ton message"
-          variant="secondary"
+          variant="primary"
+          size="lg"
+          fullWidth
+          withArrow
+          className="mt-2"
           isLoading={isSubmitting}
           submitStatus={submitStatus}
           submitMessage={submitMessage}

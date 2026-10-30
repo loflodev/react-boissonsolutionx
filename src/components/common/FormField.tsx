@@ -41,7 +41,7 @@ const FormField = ({
   };
 
   return (
-    <label htmlFor={name} className="flex flex-col gap-2">
+    <label htmlFor={name} className="flex flex-col gap-2 text-sm font-medium tracking-tight text-cream/90">
       {label}
       {multiline ? (
         <textarea {...fieldProps} />
@@ -49,7 +49,7 @@ const FormField = ({
         <input type={type} {...fieldProps} />
       )}
       {error && (
-        <p id={errorId} className="mt-1 text-sm text-red-300">
+        <p id={errorId} className="text-sm font-normal text-red-300">
           {error}
         </p>
       )}

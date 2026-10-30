@@ -10,13 +10,13 @@ interface HeaderMenuProps {
 
 const HeaderMenu = ({ color, menu, activeLink }: HeaderMenuProps) => {
   const colorOptions: Record<TextColorType, string> = {
-    primary: "hover:text-secondary text-white",
+    primary: "text-cream/80 hover:text-cream",
   };
 
   return (
     <div className="hidden md:block ml-auto">
       <nav aria-label="Navigation principale">
-        <ul className="flex items-center gap-12 text-sm">
+        <ul className="flex items-center gap-10 text-sm tracking-tight">
           {menu.map((item, index) => {
             const isActive = item.link === activeLink;
             return (

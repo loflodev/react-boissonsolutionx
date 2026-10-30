@@ -9,7 +9,7 @@ const HeaderLogo = ({ alt, link, logo }: HeaderLogoProps) => {
     <div className="md:flex md:items-center md:gap-12">
       <a className="block" href={link}>
         <img
-          className="w-[180px] md:w-[190px] h-auto"
+          className="w-[150px] md:w-[170px] h-auto"
           src={logo}
           alt={alt}
           width={229}

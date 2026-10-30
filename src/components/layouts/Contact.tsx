@@ -1,45 +1,51 @@
 import { MapPin, Store, Truck } from "lucide-react";
 import type { JSX } from "react";
+import Reveal from "../common/Reveal";
 import Section from "../common/Section";
 interface ContactsType {
   icon: JSX.Element;
   title: string;
   excerpt: string;
 }
+const ICON_PROPS = { size: 22, strokeWidth: 1.75, "aria-hidden": true } as const;
+
 const Contact = () => {
   const contacts: ContactsType[] = [
     {
-      icon: <Truck size={40} color="#fb2c36" aria-hidden="true" />,
+      icon: <Truck {...ICON_PROPS} />,
       title: "Livraison Garantie",
       excerpt: "SolutionX livrée à votre porte",
     },
     {
-      icon: <MapPin size={40} color="#fb2c36" aria-hidden="true" />,
+      icon: <MapPin {...ICON_PROPS} />,
       title: "Localisateur de magasins",
       excerpt: "Trouvez SolutionX chez le détaillant le plus près de chez vous",
     },
     {
-      icon: <Store size={40} color="#fb2c36" aria-hidden="true" />,
+      icon: <Store {...ICON_PROPS} />,
       title: "Vente en gros",
       excerpt: "Devenez un distributeur de solutionX",
     },
   ];
   return (
     <Section
-      backgroundColor="lightgray"
+      eyebrow="03 — Où acheter"
       sectionTitle="Solution locale pour vous"
       id="contact"
     >
-      <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(270px,1fr))] grid-rows-auto gap-8">
-        {contacts.map((item) => (
-          <div
+      <div className="grid grid-cols-1 md:grid-cols-3 border-y border-line md:divide-x divide-line">
+        {contacts.map((item, index) => (
+          <Reveal
             key={item.title}
-            className="flex flex-col rounded-2xl items-center justify-center px-10 py-14 shadow-2xl gap-6"
+            index={index}
+            className="flex flex-col gap-5 py-10 md:px-8 md:first:pl-0 md:last:pr-0 border-b border-line last:border-b-0 md:border-b-0"
           >
-            {item.icon}
-            <h3 className="font-bold md:text-2xl text-lg">{item.title}</h3>
-            <p className="text-base text-center">{item.excerpt}</p>
-          </div>
+            <span className="grid size-12 place-items-center rounded-full bg-secondary/10 text-secondary ring-1 ring-secondary/20">
+              {item.icon}
+            </span>
+            <h3 className="display text-cream text-2xl">{item.title}</h3>
+            <p className="text-muted leading-relaxed">{item.excerpt}</p>
+          </Reveal>
         ))}
       </div>
     </Section>

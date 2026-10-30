@@ -1,14 +1,15 @@
+import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
-type ButtonColoType = "primary" | "secondary";
-type ButtonSize = "0" | "1" | "2" | "4" | "8";
+type ButtonVariant = "primary" | "secondary";
+type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
-  variant: ButtonColoType;
-  fitContent?: boolean;
-  btnClass?: string;
-  btnSize?: ButtonSize;
+  variant: ButtonVariant;
+  size?: ButtonSize;
+  fullWidth?: boolean;
+  withArrow?: boolean;
   to?: string;
   asLink?: boolean;
   isLoading?: boolean;
@@ -16,25 +17,27 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   submitMessage?: string;
 }
 
-const COLOR_CLASSES: Record<ButtonColoType, string> = {
-  primary: "bg-secondary text-dark shadow-sm hover:bg-btn-hover active:bg-btn-active",
-  secondary: "bg-red-600 text-white hover:bg-red-700 active:bg-red-800",
+// primary: the one brand-red action per view. secondary: a quiet glass ghost
+const VARIANT_CLASSES: Record<ButtonVariant, string> = {
+  primary:
+    "bg-brand text-white hover:bg-brand-hover active:bg-brand-active shadow-[0_8px_30px_-12px_rgb(224_40_46/0.6)]",
+  secondary:
+    "border border-white/15 bg-white/[0.04] text-cream hover:bg-white/[0.08] hover:border-white/25 active:bg-white/[0.12]",
 };
 
+// Every size keeps a 44px+ touch target
 const SIZE_CLASSES: Record<ButtonSize, string> = {
-  "0": "py-1.5",
-  "1": "py-2.5",
-  "2": "py-4",
-  "4": "py-8",
-  "8": "py-16",
+  sm: "min-h-11 px-5 text-sm",
+  md: "min-h-12 px-6 text-base",
+  lg: "min-h-14 px-8 text-base md:text-lg",
 };
 
 // Feedback lives on the press: instant, and released the moment the pointer lifts
 const PRESS_CLASSES =
-  "transition-[scale,background-color] duration-100 ease-out active:scale-[0.97]";
+  "transition-[scale,background-color,border-color] duration-150 ease-out active:scale-[0.97]";
 
 // While loading the button is inert, so it gets no variant color or press feedback
-const LOADING_CLASSES = "bg-gray-400 text-white cursor-not-allowed";
+const LOADING_CLASSES = "bg-white/10 text-muted cursor-not-allowed";
 
 const FLASH_DURATION_MS = 3000;
 
@@ -61,14 +64,23 @@ const useFlashMessage = (
   return flash;
 };
 
+const Arrow = () => (
+  <ArrowRight
+    aria-hidden="true"
+    className="size-4 transition-[translate] duration-200 ease-out group-hover:translate-x-0.5"
+  />
+);
+
 const ButtonContent = ({
   label,
   isLoading,
   flash,
+  withArrow,
 }: {
   label: string;
   isLoading: boolean;
   flash: FlashMessage | null;
+  withArrow: boolean;
 }) => {
   if (flash) {
     return (
@@ -82,22 +94,27 @@ const ButtonContent = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center gap-2">
-        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+      <>
+        <span className="animate-spin rounded-full size-4 border-2 border-white/30 border-t-white"></span>
         <span>{label}</span>
-      </div>
+      </>
     );
   }
 
-  return label;
+  return (
+    <>
+      {label}
+      {withArrow && <Arrow />}
+    </>
+  );
 };
 
 const Button = ({
   label,
   variant,
-  fitContent = true,
-  btnClass,
-  btnSize = "1",
+  size = "md",
+  fullWidth = false,
+  withArrow = false,
   to,
   asLink = false,
   isLoading = false,
@@ -109,13 +126,11 @@ const Button = ({
   const flash = useFlashMessage(submitStatus, submitMessage);
 
   const buttonClasses = [
-    isLoading ? LOADING_CLASSES : `${COLOR_CLASSES[variant]} ${PRESS_CLASSES} cursor-pointer`,
-    fitContent ? "grow" : "",
-    "text-lg font-medium",
-    btnClass,
+    "group inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-tight",
+    isLoading ? LOADING_CLASSES : `${VARIANT_CLASSES[variant]} ${PRESS_CLASSES} cursor-pointer`,
+    SIZE_CLASSES[size],
+    fullWidth ? "w-full" : "",
     className,
-    "rounded-full px-8",
-    SIZE_CLASSES[btnSize],
   ]
     .filter(Boolean)
     .join(" ");
@@ -124,15 +139,21 @@ const Button = ({
   // crawlable and keyboard-native
   if (asLink && to) {
     return (
-      <a href={to} className={`${buttonClasses} inline-block text-center`}>
+      <a href={to} className={buttonClasses}>
         {label}
+        {withArrow && <Arrow />}
       </a>
     );
   }
 
   return (
     <button className={buttonClasses} {...buttonProps}>
-      <ButtonContent label={label} isLoading={isLoading} flash={flash} />
+      <ButtonContent
+        label={label}
+        isLoading={isLoading}
+        flash={flash}
+        withArrow={withArrow}
+      />
     </button>
   );
 };

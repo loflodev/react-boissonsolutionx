@@ -1,23 +1,47 @@
 @import "tailwindcss";
 
+/* Design system: see docs/design-system.md ("Dark cinematic") */
 @theme {
   --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display Variable", "Playfair Display", ui-serif,
+    Georgia, serif;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
 
+  /* Surfaces: the deep navy of the bottles photograph */
+  --color-ink: #0b1220;
+  --color-ink-raised: #111a2e;
+  --color-cream: #f5f1ea;
+  --color-muted: rgb(245 241 234 / 0.68);
+  --color-line: rgb(255 255 255 / 0.08);
+
+  /* Brand red is for fills only (white on it: 4.7:1). On ink, accent text
+     uses the coral, which keeps 7.6:1 where red text would drop to 4:1 */
+  --color-brand: #e0282e;
+  --color-brand-hover: #ea3a40;
+  --color-brand-active: #c21f25;
   --color-secondary: #fe806b;
-  --color-paragraph: #565e6b;
+
   --color-dark: #191919;
-  --color-gray: #565e6b;
-  --color-btn-hover: #e57360;
-  --color-btn-active: #cb6656;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
     font-optical-sizing: auto;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-cream);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: #fff;
   }
 
   /* Keep anchored sections clear of the fixed header */
@@ -27,7 +51,7 @@
 
   :focus-visible {
     outline: 2px solid var(--color-secondary);
-    outline-offset: 2px;
+    outline-offset: 3px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -45,28 +69,52 @@
 }
 
 @layer components {
-  .text-shadow {
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* soft dark shadow */
+  /* Small uppercase label that opens each section ("01 — Nos produits") */
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-secondary);
   }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
   /* Translucent chrome: content scrolls under a blurred layer instead of an
      opaque strip. The blur lives on a pseudo-element so the element itself is
      not a backdrop root, which lets nested chrome (the mobile menu) blur the
      page too. */
   .material-chrome {
-    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    border-bottom: 1px solid var(--color-line);
+    transition: border-color 300ms ease-out;
     &::before {
       content: "";
       position: absolute;
       inset: 0;
       z-index: -1;
-      background-color: rgb(16 24 40 / 0.72);
+      background-color: rgb(11 18 32 / 0.72);
       backdrop-filter: blur(24px) saturate(160%);
       -webkit-backdrop-filter: blur(24px) saturate(160%);
+      transition: opacity 300ms ease-out;
+    }
+    /* Over the hero the bar is clear; the material arrives once content
+       starts scrolling beneath it */
+    &[data-scrolled="false"] {
+      border-bottom-color: transparent;
+      &::before {
+        opacity: 0;
+      }
     }
   }
   @media (prefers-reduced-transparency: reduce) {
     .material-chrome::before {
-      background-color: #101828;
+      background-color: var(--color-ink);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
@@ -76,21 +124,75 @@
       border-bottom-color: rgb(255 255 255 / 0.6);
     }
     .material-chrome::before {
-      background-color: #101828;
+      background-color: var(--color-ink);
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
   }
+
   .form-input {
-    transition: border-color 150ms ease-out;
-    color: lightgray;
-    background-color: #1f2937;
-    border: 1px solid #374151;
-    border-radius: 0.375em;
-    padding: 0.5em 0 0.5em 1em;
+    color: var(--color-cream);
+    background-color: rgb(255 255 255 / 0.04);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: 0.75rem;
+    padding: 0.875rem 1rem;
+    transition:
+      border-color 150ms ease-out,
+      background-color 150ms ease-out;
+    &:hover {
+      border-color: rgb(255 255 255 / 0.18);
+    }
     &:focus-visible {
-      outline: 2px solid var(--color-secondary);
+      outline: 2px solid var(--color-brand);
       outline-offset: 2px;
+      background-color: rgb(255 255 255 / 0.06);
+    }
+  }
+
+  /* Decorative section layers (see components/common/Decor.tsx) */
+  .decor-grain {
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .decor-watermark {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 0.8;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(255 255 255 / 0.07);
+  }
+  .decor-fade {
+    color: rgb(255 255 255 / 0.09);
+    mask-image: radial-gradient(closest-side, #000 55%, transparent);
+  }
+  @media (prefers-contrast: more) {
+    .decor-grain,
+    .decor-watermark,
+    .decor-fade {
+      display: none;
+    }
+  }
+
+  /* Scroll reveal. Content is only hidden once JS has marked the document
+     (html.js-reveal, set in main.tsx), so the prerendered HTML, crawlers and
+     no-JS readers always see everything */
+  .js-reveal [data-reveal]:not([data-visible="true"]) {
+    opacity: 0;
+    translate: 0 16px;
+  }
+  .js-reveal [data-reveal] {
+    transition:
+      opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+      translate 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--i, 0) * 80ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .js-reveal [data-reveal]:not([data-visible="true"]) {
+      opacity: 1;
+      translate: none;
     }
   }
 }
