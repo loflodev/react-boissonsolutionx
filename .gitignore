@@ -34,3 +34,6 @@ test-results
 # PHP (backend tests)
 vendor
 .phpunit.cache
+
+# Local working notes (not shared)
+docs/security-audit-*.md
