@@ -1,6 +1,6 @@
 import { AxiosError, AxiosHeaders } from "axios";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import axiosInstance from "../api/axios";
+import axiosInstance, { CONTACT_FORM_ID, GRAPHQL_ENDPOINT } from "../api/axios";
 import {
   GraphQLServiceError,
   NetworkError,
@@ -100,6 +100,19 @@ describe("submitContactForm", () => {
     };
     expect(input.variables.input).not.toHaveProperty("status");
     expect(input.variables.input.website).toBe("");
+  });
+
+  it("posts to the configured endpoint with the Contact Form 7 id", async () => {
+    post.mockResolvedValue({ status: 200, data: {} });
+
+    await submitContactForm("mutation", formData);
+
+    const [endpoint, body] = post.mock.calls[0] as [
+      string,
+      { variables: { input: Record<string, string> } },
+    ];
+    expect(endpoint).toBe(GRAPHQL_ENDPOINT);
+    expect(body.variables.input.formId).toBe(CONTACT_FORM_ID);
   });
 
   it("throws ValidationError when a field is missing", async () => {

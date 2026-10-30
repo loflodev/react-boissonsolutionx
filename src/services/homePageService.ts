@@ -8,7 +8,11 @@ import {
   type HomePageDataResponse,
   type Page,
 } from "../type";
-import axiosInstance, { isAxiosError } from "../api/axios";
+import axiosInstance, {
+  CONTACT_FORM_ID,
+  GRAPHQL_ENDPOINT,
+  isAxiosError,
+} from "../api/axios";
 
 // Map any thrown value to one of the service error types
 const toServiceError = (error: unknown): Error => {
@@ -55,7 +59,7 @@ export const getHomePageData = async (
     }
 
     const response = await axiosInstance.post<HomePageDataResponse>(
-      "/graphql",
+      GRAPHQL_ENDPOINT,
       {
         query,
       }
@@ -102,7 +106,7 @@ export const submitContactForm = async (
       throw new ValidationError("All fields are required");
     }
 
-    const response = await axiosInstance.post<ContactFormResponse>("/graphql", {
+    const response = await axiosInstance.post<ContactFormResponse>(GRAPHQL_ENDPOINT, {
       query: query,
       variables: {
         input: {
@@ -110,6 +114,7 @@ export const submitContactForm = async (
           title: `Contact from ${formData.fullName}`,
           content: `Name: ${formData.fullName}\nEmail: ${formData.email}\nMessage: ${formData.message}`,
           website: formData.website ?? "",
+          formId: CONTACT_FORM_ID,
         },
       },
     });

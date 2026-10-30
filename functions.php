@@ -40,6 +40,27 @@ add_action('admin_init', function () {
     update_option('contact_messages_migrated', 1);
 });
 
+// Resolve a Contact Form 7 form from its hash id ("cddc821", CF7 5.8+) or numeric post id.
+function boissonsx_find_contact_form($form_id) {
+    $form_id = sanitize_text_field((string) $form_id);
+    if ($form_id === '' || !class_exists('WPCF7_ContactForm')) {
+        return null;
+    }
+
+    if (function_exists('wpcf7_get_contact_form_by_hash')) {
+        $form = wpcf7_get_contact_form_by_hash($form_id);
+        if ($form) {
+            return $form;
+        }
+    }
+
+    if (ctype_digit($form_id)) {
+        return wpcf7_contact_form((int) $form_id);
+    }
+
+    return null;
+}
+
 add_action('graphql_register_types', function () {
 
     register_graphql_object_type('ContactMessage', [
@@ -110,6 +131,10 @@ add_action('graphql_register_types', function () {
             'website' => [
                 'type' => 'String',
                 'description' => 'Honeypot field. Must stay empty.',
+            ],
+            'formId' => [
+                'type' => 'String',
+                'description' => 'Contact Form 7 form used to send the notification email: hash id (e.g. "cddc821") or numeric post id.',
             ],
         ],
         'outputFields' => [
@@ -192,10 +217,12 @@ add_action('graphql_register_types', function () {
             
             // If Contact Form 7 is active, try to send the email
             if (class_exists('WPCF7')) {
-                // Try to find the form by title first
-                $forms = WPCF7_ContactForm::find();
-                $contact_form = null;
-                
+                // Use the form the frontend asked for (VITE_CONTACT_FORM_ID)
+                $contact_form = boissonsx_find_contact_form($input['formId'] ?? '');
+
+                // Otherwise fall back to the form titled "Contact form 1"
+                $forms = $contact_form ? [] : WPCF7_ContactForm::find();
+
                 foreach ($forms as $form) {
                     if ($form->title() === 'Contact form 1') {
                         $contact_form = $form;
