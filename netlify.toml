@@ -34,8 +34,7 @@
   [headers.values]
     Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
 
-# Framing is blocked now. The full policy is report-only until the deploy
-# preview console shows no violations, then it moves to Content-Security-Policy.
+# Enforced after the live site loaded with no report-only violations (2026-10-30).
 # The JSON <script> blocks in index.html are data, not run, so script-src
 # 'self' is enough; 'unsafe-inline' styles cover the style="--i:N" attributes.
 # connect-src/img-src allow https: because the WordPress host is set per
@@ -45,5 +44,4 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
-    Content-Security-Policy-Report-Only = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self'; connect-src 'self' https:; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self'; connect-src 'self' https:; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
