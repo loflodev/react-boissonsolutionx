@@ -17,6 +17,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-optical-sizing: auto;
   }
 
   /* Keep anchored sections clear of the fixed header */
@@ -47,7 +48,41 @@
   .text-shadow {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* soft dark shadow */
   }
+  /* Translucent chrome: content scrolls under a blurred layer instead of an
+     opaque strip. The blur lives on a pseudo-element so the element itself is
+     not a backdrop root, which lets nested chrome (the mobile menu) blur the
+     page too. */
+  .material-chrome {
+    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-color: rgb(16 24 40 / 0.72);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .material-chrome::before {
+      background-color: #101828;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+  @media (prefers-contrast: more) {
+    .material-chrome {
+      border-bottom-color: rgb(255 255 255 / 0.6);
+    }
+    .material-chrome::before {
+      background-color: #101828;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
   .form-input {
+    transition: border-color 150ms ease-out;
     color: lightgray;
     background-color: #1f2937;
     border: 1px solid #374151;

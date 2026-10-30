@@ -41,7 +41,7 @@ const Section = ({
       <div className="grow">
         {sectionTitle && (
           <h2
-            className={`${secTitleColors[backgroundColor]} text-2xl lg:text-3xl font-bold tracking-wide text-center mb-22`}
+            className={`${secTitleColors[backgroundColor]} text-2xl lg:text-3xl font-bold tracking-tight text-balance text-center mb-22`}
           >
             {sectionTitle}
           </h2>

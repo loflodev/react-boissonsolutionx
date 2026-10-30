@@ -10,6 +10,7 @@ interface FormFieldProps {
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 const FormField = ({
@@ -22,6 +23,7 @@ const FormField = ({
   fieldClass = "",
   autoComplete,
   onChange,
+  onBlur,
 }: FormFieldProps) => {
   const errorId = `${name}-error`;
   const className = `form-input ${fieldClass} ${error ? "border-red-500" : ""}`;
@@ -30,6 +32,7 @@ const FormField = ({
     name,
     value,
     onChange,
+    onBlur,
     className,
     autoComplete,
     required: true,

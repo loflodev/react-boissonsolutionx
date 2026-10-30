@@ -20,7 +20,7 @@ const LoadError = () => (
       </p>
       <button
         onClick={() => window.location.reload()}
-        className="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition-colors"
+        className="cursor-pointer px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 active:bg-red-900 active:scale-[0.97] transition-[scale,background-color] duration-100 ease-out"
       >
         Réessayer
       </button>

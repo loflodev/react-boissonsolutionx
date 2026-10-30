@@ -35,7 +35,7 @@ const OurProduct = ({ products }: ProductCardProps) => {
                 <p className="md:text-[15px] text-base my-6">
                   {item.description}
                 </p>
-                <ul className="flex justify-between text-[11px] mb-4">
+                <ul className="flex justify-between text-xs tracking-wide mb-4">
                   <li>{item.features.feature1}</li>
                   <li>{item.features.feature2}</li>
                 </ul>

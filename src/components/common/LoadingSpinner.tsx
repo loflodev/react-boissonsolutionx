@@ -1,8 +1,10 @@
 const LoadingSpinner = () => {
   return (
+    // Holds the hero's place (same dark ground) instead of blacking out the
+    // whole page, so the content arrives where the placeholder was
     <div
       role="status"
-      className="fixed inset-0 bg-black/75 flex items-center justify-center z-50"
+      className="min-h-screen bg-gray-900 flex items-center justify-center"
     >
       <div className="flex flex-col items-center">
         <div

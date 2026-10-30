@@ -11,6 +11,7 @@ const ContactForm = () => {
     submitMessage,
     isSubmitting,
     handleInputChange,
+    handleBlur,
     handleSubmit,
   } = useContactFormQuery();
 
@@ -32,6 +33,7 @@ const ContactForm = () => {
           value={formData.fullName}
           error={errors.fullName}
           onChange={handleInputChange}
+          onBlur={handleBlur}
         />
 
         <FormField
@@ -42,6 +44,7 @@ const ContactForm = () => {
           value={formData.email}
           error={errors.email}
           onChange={handleInputChange}
+          onBlur={handleBlur}
         />
 
         <FormField
@@ -52,6 +55,7 @@ const ContactForm = () => {
           value={formData.message}
           error={errors.message}
           onChange={handleInputChange}
+          onBlur={handleBlur}
         />
 
         {/* Honeypot: hidden from people, filled by bots */}

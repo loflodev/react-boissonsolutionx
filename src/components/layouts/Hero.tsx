@@ -28,22 +28,18 @@ const Hero = ({ heroData }: HeroProps) => {
             <div aria-hidden="true" className="flex justify-center lg:justify-start">
               <div className="relative">
                 {/* Splash effects */}
-                <div className="absolute -top-10 -left-10 w-32 h-32 opacity-30">
-                  <div className="w-full h-full bg-gradient-to-br from-blue-400 to-transparent rounded-full blur-xl"></div>
-                </div>
-                <div className="absolute top-20 -right-8 w-24 h-24 opacity-40">
-                  <div className="w-full h-full bg-gradient-to-br from-orange-400 to-transparent rounded-full blur-lg"></div>
-                </div>
+                <div className="absolute -top-10 -left-10 w-32 h-32 opacity-30 bg-gradient-to-br from-blue-400 to-transparent rounded-full blur-xl"></div>
+                <div className="absolute top-20 -right-8 w-24 h-24 opacity-40 bg-gradient-to-br from-orange-400 to-transparent rounded-full blur-lg"></div>
               </div>
             </div>
 
             {/* Right side - Text content */}
             <div className="text-white space-y-6 lg:pl-8">
               <div className="space-y-2">
-                <p className="text-red-500 text-2xl lg:text-3xl font-bold tracking-wide">
+                <p className="text-red-500 text-2xl lg:text-3xl font-bold tracking-tight">
                   {heroData?.title}
                 </p>
-                <h1 className="text-white text-4xl lg:text-6xl font-bold leading-tight">
+                <h1 className="text-white text-4xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-balance">
                   {heroData?.subtitle}
                 </h1>
               </div>
@@ -71,11 +67,11 @@ const Hero = ({ heroData }: HeroProps) => {
         </div>
       </div>
 
-      {/* Additional decorative elements */}
+      {/* Additional decorative elements (static: looping motion here has no purpose) */}
       <div aria-hidden="true">
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-orange-400 rounded-full opacity-60 animate-pulse"></div>
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-blue-400 rounded-full opacity-80 animate-pulse delay-1000"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-3 h-3 bg-red-400 rounded-full opacity-40 animate-pulse delay-500"></div>
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-orange-400 rounded-full opacity-60"></div>
+        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-blue-400 rounded-full opacity-80"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-3 h-3 bg-red-400 rounded-full opacity-40"></div>
       </div>
     </section>
   );

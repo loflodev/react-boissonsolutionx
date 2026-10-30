@@ -6,10 +6,10 @@ const About = () => {
     <Section backgroundColor="white" id="about">
       <div className="grid grid-cols-[repeat(auto-fit,minmax(350px,1fr))] gap-12 grid-rows-auto items-center">
         <div className="flex flex-col gap-8 px-4 md:px-0">
-          <h2 className="text-2xl lg:text-3xl font-bold">
+          <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-balance">
             Chez Boisson SolutionX
           </h2>
-          <p className="md:text-lg text-xl">
+          <p className="text-lg leading-relaxed">
             Nous avons à cœur la vitalité naturelle et l’énergie de chacun de
             nos consommateurs. Tous nos jus de fruits naturels sont mélangés
             avec du "petit colas", une noix aussi connue sous le nom de "cola

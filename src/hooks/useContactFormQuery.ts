@@ -95,6 +95,17 @@ const useContactFormQuery = () => {
     }
   };
 
+  // Validate a field as the user leaves it, so mistakes surface inline rather
+  // than only on submit. Empty fields wait for submit to avoid nagging on tab-through.
+  const handleBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    if (!value.trim()) return;
+    const fieldError = validateContactForm(formData)[name as keyof FormErrors];
+    setErrors((prev) => ({ ...prev, [name]: fieldError }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -119,6 +130,7 @@ const useContactFormQuery = () => {
     isError: mutation.isError,
     isSuccess: mutation.isSuccess,
     handleInputChange,
+    handleBlur,
     handleSubmit,
     resetForm: () => {
       setFormData(EMPTY_FORM);

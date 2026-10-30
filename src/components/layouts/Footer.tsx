@@ -4,7 +4,7 @@ const Footer = () => {
       <div className="relative mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8 lg:pt-24">
         <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
           <a
-            className="inline-block rounded-full bg-teal-600 p-2 text-white shadow-sm transition hover:bg-teal-500 sm:p-3 lg:p-4 dark:bg-gray-700 dark:text-teal-300 dark:hover:bg-gray-600"
+            className="inline-block rounded-full bg-red-600 p-2 text-white shadow-sm transition-[scale,background-color] duration-100 ease-out hover:bg-red-700 active:bg-red-800 active:scale-[0.94] sm:p-3 lg:p-4"
             href="#hero"
           >
             <span className="sr-only">Retour en haut</span>

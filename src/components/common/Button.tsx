@@ -17,8 +17,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const COLOR_CLASSES: Record<ButtonColoType, string> = {
-  primary: "bg-secondary text-dark shadow-sm hover:bg-btn-hover",
-  secondary: "bg-red-600 text-white hover:bg-red-700",
+  primary: "bg-secondary text-dark shadow-sm hover:bg-btn-hover active:bg-btn-active",
+  secondary: "bg-red-600 text-white hover:bg-red-700 active:bg-red-800",
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
@@ -28,6 +28,13 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
   "4": "py-8",
   "8": "py-16",
 };
+
+// Feedback lives on the press: instant, and released the moment the pointer lifts
+const PRESS_CLASSES =
+  "transition-[scale,background-color] duration-100 ease-out active:scale-[0.97]";
+
+// While loading the button is inert, so it gets no variant color or press feedback
+const LOADING_CLASSES = "bg-gray-400 text-white cursor-not-allowed";
 
 const FLASH_DURATION_MS = 3000;
 
@@ -102,15 +109,13 @@ const Button = ({
   const flash = useFlashMessage(submitStatus, submitMessage);
 
   const buttonClasses = [
-    COLOR_CLASSES[variant],
+    isLoading ? LOADING_CLASSES : `${COLOR_CLASSES[variant]} ${PRESS_CLASSES} cursor-pointer`,
     fitContent ? "grow" : "",
     "text-lg font-medium",
     btnClass,
     className,
     "rounded-full px-8",
     SIZE_CLASSES[btnSize],
-    "cursor-pointer",
-    isLoading ? "bg-gray-400 cursor-not-allowed" : "",
   ]
     .filter(Boolean)
     .join(" ");

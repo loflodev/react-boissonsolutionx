@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+import { MapPin, Store, Truck } from "lucide-react";
 import type { JSX } from "react";
 import Section from "../common/Section";
 interface ContactsType {
@@ -9,7 +9,7 @@ interface ContactsType {
 const Contact = () => {
   const contacts: ContactsType[] = [
     {
-      icon: <Mail size={40} color="#fb2c36" aria-hidden="true" />,
+      icon: <Truck size={40} color="#fb2c36" aria-hidden="true" />,
       title: "Livraison Garantie",
       excerpt: "SolutionX livrée à votre porte",
     },
@@ -19,7 +19,7 @@ const Contact = () => {
       excerpt: "Trouvez SolutionX chez le détaillant le plus près de chez vous",
     },
     {
-      icon: <Phone size={40} color="#fb2c36" aria-hidden="true" />,
+      icon: <Store size={40} color="#fb2c36" aria-hidden="true" />,
       title: "Vente en gros",
       excerpt: "Devenez un distributeur de solutionX",
     },
@@ -31,9 +31,9 @@ const Contact = () => {
       id="contact"
     >
       <div className="w-full grid grid-cols-[repeat(auto-fit,minmax(270px,1fr))] grid-rows-auto gap-8">
-        {contacts.map((item, index) => (
+        {contacts.map((item) => (
           <div
-            key={`${item}-${index}`}
+            key={item.title}
             className="flex flex-col rounded-2xl items-center justify-center px-10 py-14 shadow-2xl gap-6"
           >
             {item.icon}
