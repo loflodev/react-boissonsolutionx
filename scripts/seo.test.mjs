@@ -6,6 +6,7 @@ import {
   buildLlmsTxt,
   buildSitemap,
   escapeXml,
+  fillTemplate,
   pickPreloadFonts,
   stripHtml,
   toOrigin,
@@ -183,5 +184,24 @@ describe("buildHeadExtra", () => {
   it("omits the preconnect when the origin is unknown", () => {
     const minimal = buildHeadExtra({ jsonLd: [], homeData: {}, homeDataId: "x", wpOrigin: null });
     expect(minimal).not.toContain("preconnect");
+  });
+});
+
+describe("fillTemplate", () => {
+  const template =
+    '<head><!--head-extra--></head><div id="root"><!--app-html--></div><script type="module" src="/x.js"></script> __SITE_URL__/';
+
+  it("fills every placeholder", () => {
+    expect(fillTemplate(template, { appHtml: "<main></main>", headExtra: "<meta>", siteUrl: SITE })).toBe(
+      `<head><meta></head><div id="root"><main></main></div><script type="module" src="/x.js"></script> ${SITE}/`
+    );
+  });
+
+  it("keeps $ patterns in WordPress text literal", () => {
+    const appHtml = "<h3>Prix $' et $` et $&</h3>";
+    const html = fillTemplate(template, { appHtml, headExtra: toScriptJson({ name: "$'" }), siteUrl: SITE });
+    expect(html).toContain(appHtml);
+    expect(html).toContain('{"name":"$\'"}');
+    expect(html.match(/<script type="module"/g)).toHaveLength(1);
   });
 });

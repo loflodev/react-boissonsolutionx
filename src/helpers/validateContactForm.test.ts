@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateContactForm } from "./validateContactForm";
+import { CONTACT_LIMITS, validateContactForm } from "./validateContactForm";
 
 const valid = {
   fullName: "Jean Tremblay",
@@ -31,6 +31,20 @@ describe("validateContactForm", () => {
   it("rejects a message shorter than 10 characters", () => {
     expect(validateContactForm({ ...valid, message: "  court  " })).toEqual({
       message: "Le message doit contenir au moins 10 caractères",
+    });
+  });
+
+  it("rejects fields longer than the server accepts", () => {
+    expect(
+      validateContactForm({
+        fullName: "a".repeat(CONTACT_LIMITS.fullName + 1),
+        email: `${"a".repeat(CONTACT_LIMITS.email)}@example.com`,
+        message: "a".repeat(CONTACT_LIMITS.message + 1),
+      })
+    ).toEqual({
+      fullName: "Le nom ne peut pas dépasser 100 caractères",
+      email: "Adresse courriel invalide",
+      message: "Le message ne peut pas dépasser 4000 caractères",
     });
   });
 });

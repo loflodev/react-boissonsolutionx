@@ -125,6 +125,15 @@ Chez Boisson SolutionX, tous nos jus de fruits naturels sont mélangés avec du 
 - [Nous contacter](${siteUrl}/#contactForm)
 `;
 
+// Fill the built index.html (or robots.txt) placeholders. Replacer functions,
+// not strings: in a replacement string `$'`, `` $` `` and `$&` are patterns,
+// and WordPress text must come out exactly as written
+export const fillTemplate = (template, { appHtml = "", headExtra = "", siteUrl }) =>
+  template
+    .replace("<!--app-html-->", () => appHtml)
+    .replace("<!--head-extra-->", () => headExtra)
+    .replace(/__SITE_URL__/g, () => siteUrl);
+
 // Hashed font files from dist/assets that the first paint needs
 export const pickPreloadFonts = (assetNames) =>
   PRELOADED_FONTS.map((pattern) => assetNames.find((name) => pattern.test(name))).filter(

@@ -15,10 +15,15 @@ const queryClient = new QueryClient();
 // matches the prerendered HTML; React Query still refreshes it in the background
 const homeDataScript = document.getElementById(HOME_DATA_SCRIPT_ID);
 if (homeDataScript?.textContent) {
-  queryClient.setQueryData(
-    HOME_PAGE_QUERY_KEY,
-    JSON.parse(homeDataScript.textContent)
-  );
+  // Unreadable data must not stop the app: React Query fetches it instead
+  try {
+    queryClient.setQueryData(
+      HOME_PAGE_QUERY_KEY,
+      JSON.parse(homeDataScript.textContent)
+    );
+  } catch (error) {
+    console.error("Embedded home data unreadable, fetching instead:", error);
+  }
 }
 
 const app = (

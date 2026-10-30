@@ -10,6 +10,7 @@ import type { Page } from "./type";
 
 export { HOME_DATA_SCRIPT_ID } from "./entry-shared";
 export { convertToArray } from "./helpers/utils";
+export { sanitizeHomeContent } from "./helpers/sanitizeHtml";
 
 // Built with `vite build --ssr`, so the WordPress endpoint comes from the same
 // VITE_* env as the browser bundle

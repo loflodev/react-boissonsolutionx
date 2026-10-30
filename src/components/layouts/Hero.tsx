@@ -3,12 +3,13 @@ interface HeroProps {
 }
 import DOMPurify from "dompurify";
 import Button from "../common/Button";
+import { sanitizeHtml } from "../../helpers/sanitizeHtml";
 import type { HeroSection } from "../../type";
 
-// DOMPurify needs a DOM; during the build-time prerender the HTML comes
-// straight from our own WordPress, so it is passed through as-is there
+// DOMPurify needs a DOM. During the build-time prerender there is none, and
+// the content was already sanitized with a jsdom window (scripts/prerender.mjs)
 const sanitize = (html: string) =>
-  typeof window === "undefined" ? html : DOMPurify.sanitize(html);
+  typeof window === "undefined" ? html : sanitizeHtml(html, DOMPurify);
 
 const Hero = ({ heroData }: HeroProps) => {
   return (

@@ -7,6 +7,7 @@ interface FormFieldProps {
   multiline?: boolean;
   fieldClass?: string;
   autoComplete?: string;
+  maxLength?: number;
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
@@ -22,6 +23,7 @@ const FormField = ({
   multiline = false,
   fieldClass = "",
   autoComplete,
+  maxLength,
   onChange,
   onBlur,
 }: FormFieldProps) => {
@@ -35,6 +37,7 @@ const FormField = ({
     onBlur,
     className,
     autoComplete,
+    maxLength,
     required: true,
     "aria-invalid": error ? true : undefined,
     "aria-describedby": error ? errorId : undefined,

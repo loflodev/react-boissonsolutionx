@@ -1,5 +1,6 @@
 import { CircleCheck } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { CONTACT_LIMITS } from "../../helpers/validateContactForm";
 import useContactFormQuery from "../../hooks/useContactFormQuery";
 import Button from "../common/Button";
 import { Glow, Grain, Rings } from "../common/Decor";
@@ -100,6 +101,7 @@ const ContactForm = ({ inquiry }: { inquiry?: Inquiry | null }) => {
             label="Nom Complet *"
             autoComplete="name"
             value={formData.fullName}
+            maxLength={CONTACT_LIMITS.fullName}
             error={errors.fullName}
             onChange={handleInputChange}
             onBlur={handleBlur}
@@ -111,6 +113,7 @@ const ContactForm = ({ inquiry }: { inquiry?: Inquiry | null }) => {
             label="Courriel *"
             autoComplete="email"
             value={formData.email}
+            maxLength={CONTACT_LIMITS.email}
             error={errors.email}
             onChange={handleInputChange}
             onBlur={handleBlur}
@@ -122,6 +125,7 @@ const ContactForm = ({ inquiry }: { inquiry?: Inquiry | null }) => {
             multiline
             fieldClass="h-44 resize-y"
             value={formData.message}
+            maxLength={CONTACT_LIMITS.message}
             error={errors.message}
             onChange={handleInputChange}
             onBlur={handleBlur}
