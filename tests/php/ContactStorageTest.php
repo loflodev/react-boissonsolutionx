@@ -47,6 +47,40 @@ final class ContactStorageTest extends TestCase
         $this->assertSame('post', WpState::$posts[$late]->post_type);
     }
 
+    public function testOnlyAdministratorsCanReadMessages(): void
+    {
+        $type = WpState::$postTypes['contact_message'];
+
+        $this->assertTrue($type['map_meta_cap']);
+        $this->assertSame('do_not_allow', $type['capabilities']['create_posts']);
+        foreach (array_diff_key($type['capabilities'], ['create_posts' => true]) as $cap) {
+            $this->assertSame('manage_options', $cap);
+        }
+        $this->assertSame('manage_options', $type['capabilities']['read_private_posts']);
+    }
+
+    public function testRetriesTheMigrationUntilNoPublicSubmissionIsLeft(): void
+    {
+        $stuck = wp_insert_post(['post_type' => 'post', 'post_status' => 'publish']);
+        update_post_meta($stuck, '_contact_form_submission', true);
+        $moved = wp_insert_post(['post_type' => 'post', 'post_status' => 'publish']);
+        update_post_meta($moved, '_contact_form_submission', true);
+        WpState::$failUpdateIds = [$stuck];
+
+        WpState::fire('admin_init');
+
+        $this->assertSame('contact_message', WpState::$posts[$moved]->post_type);
+        $this->assertSame('post', WpState::$posts[$stuck]->post_type);
+        $this->assertArrayNotHasKey('contact_messages_migrated', WpState::$options);
+
+        // The next admin request finishes the job
+        WpState::$failUpdateIds = [];
+        WpState::fire('admin_init');
+
+        $this->assertSame('private', WpState::$posts[$stuck]->post_status);
+        $this->assertSame(1, WpState::$options['contact_messages_migrated']);
+    }
+
     public function testFindsAFormByHashOrNumericId(): void
     {
         WPCF7_ContactForm::add(12, 'Contact form 1', 'cddc821');

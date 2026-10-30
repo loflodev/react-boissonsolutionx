@@ -23,6 +23,10 @@ final class WpState
     public static array $options = [];
     /** @var array<string, array{value: mixed, ttl: int}> */
     public static array $transients = [];
+    /** @var array<string, mixed> Value each filter returns instead of its default */
+    public static array $filters = [];
+    /** @var list<int> Posts wp_update_post fails to update */
+    public static array $failUpdateIds = [];
     public static ?WP_Error $nextInsertError = null;
     public static int $nextId = 100;
 
@@ -32,6 +36,8 @@ final class WpState
         self::$meta = [];
         self::$options = [];
         self::$transients = [];
+        self::$filters = [];
+        self::$failUpdateIds = [];
         self::$nextInsertError = null;
         self::$nextId = 100;
         WPCF7_ContactForm::$forms = [];
@@ -63,6 +69,11 @@ function add_action(string $hook, callable $callback): void
     WpState::$actions[$hook][] = $callback;
 }
 
+function apply_filters(string $hook, mixed $value): mixed
+{
+    return array_key_exists($hook, WpState::$filters) ? WpState::$filters[$hook] : $value;
+}
+
 function register_post_type(string $type, array $args): void
 {
     WpState::$postTypes[$type] = $args;
@@ -81,6 +92,21 @@ function register_graphql_mutation(string $name, array $config): void
 function sanitize_text_field(string $text): string
 {
     return trim(preg_replace('/\s+/', ' ', strip_tags($text)));
+}
+
+function sanitize_textarea_field(string $text): string
+{
+    return trim(strip_tags($text));
+}
+
+function sanitize_email(string $email): string
+{
+    return preg_replace('/[^a-z0-9+_.@-]/i', '', $email);
+}
+
+function is_email(string $email): string|false
+{
+    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false ? $email : false;
 }
 
 // Close enough to WordPress for the tests: drops scripts and unknown tags
@@ -110,9 +136,12 @@ function wp_insert_post(array $args, bool $wp_error = false): int|WP_Error
     return $id;
 }
 
-function wp_update_post(array $args): int
+function wp_update_post(array $args, bool $wp_error = false): int|WP_Error
 {
     $id = $args['ID'];
+    if (in_array($id, WpState::$failUpdateIds, true)) {
+        return $wp_error ? new WP_Error('db_update_error', 'Could not update post in the database.') : 0;
+    }
     foreach ($args as $key => $value) {
         WpState::$posts[$id]->$key = $value;
     }
@@ -217,9 +246,11 @@ class WPCF7_ContactForm
         return $this->title;
     }
 
-    public function submit(): void
+    /** @return array{status: string} */
+    public function submit(): array
     {
         self::$submissions[] = ['form' => $this->id, 'post' => $_POST];
+        return ['status' => 'mail_sent'];
     }
 }
 
