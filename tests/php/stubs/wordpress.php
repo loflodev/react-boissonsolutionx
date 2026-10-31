@@ -4,6 +4,7 @@
 // WpState so tests can assert on it; WpState::reset() starts a test clean.
 
 const MINUTE_IN_SECONDS = 60;
+const DAY_IN_SECONDS = 86400;
 
 final class WpState
 {
@@ -27,6 +28,8 @@ final class WpState
     public static array $filters = [];
     /** @var list<int> Posts wp_update_post fails to update */
     public static array $failUpdateIds = [];
+    /** @var array<string, array{timestamp: int, recurrence: string}> WP-Cron events by hook */
+    public static array $cron = [];
     public static ?WP_Error $nextInsertError = null;
     public static int $nextId = 100;
 
@@ -38,6 +41,7 @@ final class WpState
         self::$transients = [];
         self::$filters = [];
         self::$failUpdateIds = [];
+        self::$cron = [];
         self::$nextInsertError = null;
         self::$nextId = 100;
         WPCF7_ContactForm::$forms = [];
@@ -130,7 +134,7 @@ function wp_insert_post(array $args, bool $wp_error = false): int|WP_Error
     }
     $id = WpState::$nextId++;
     WpState::$posts[$id] = (object) array_merge(
-        ['ID' => $id, 'post_status' => 'draft', 'post_content' => '', 'post_title' => ''],
+        ['ID' => $id, 'post_status' => 'draft', 'post_content' => '', 'post_title' => '', 'post_date_gmt' => gmdate('Y-m-d H:i:s')],
         $args
     );
     return $id;
@@ -163,9 +167,32 @@ function get_posts(array $args): array
         if (isset($args['meta_key']) && !isset(WpState::$meta[$id][$args['meta_key']])) {
             continue;
         }
+        $before = $args['date_query'][0]['before'] ?? null;
+        if ($before !== null && $post->post_date_gmt >= $before) {
+            continue;
+        }
         $ids[] = $id;
     }
-    return $ids;
+    $limit = $args['posts_per_page'] ?? -1;
+    return $limit > 0 ? array_slice($ids, 0, $limit) : $ids;
+}
+
+function wp_delete_post(int $id, bool $force_delete = false): ?object
+{
+    $post = WpState::$posts[$id] ?? null;
+    unset(WpState::$posts[$id], WpState::$meta[$id]);
+    return $post;
+}
+
+function wp_next_scheduled(string $hook): int|false
+{
+    return WpState::$cron[$hook]['timestamp'] ?? false;
+}
+
+function wp_schedule_event(int $timestamp, string $recurrence, string $hook): bool
+{
+    WpState::$cron[$hook] = ['timestamp' => $timestamp, 'recurrence' => $recurrence];
+    return true;
 }
 
 function get_the_title(int $id): string

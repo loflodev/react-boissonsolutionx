@@ -98,4 +98,58 @@ final class ContactStorageTest extends TestCase
         $this->assertNull(boissonsx_find_contact_form('ffffff0'));
         $this->assertNull(boissonsx_find_contact_form('99'));
     }
+
+    public function testSchedulesTheDailyCleanupOnce(): void
+    {
+        WpState::fire('init');
+        $first = WpState::$cron['boissonsx_purge_contact_messages'];
+        WpState::fire('init');
+
+        $this->assertSame('daily', $first['recurrence']);
+        $this->assertSame($first, WpState::$cron['boissonsx_purge_contact_messages']);
+    }
+
+    public function testDeletesContactMessagesOlderThanTwelveMonths(): void
+    {
+        $old = wp_insert_post(['post_type' => 'contact_message', 'post_status' => 'private',
+            'post_date_gmt' => gmdate('Y-m-d H:i:s', time() - 366 * DAY_IN_SECONDS)]);
+        update_post_meta($old, '_contact_form_email', 'jean@example.com');
+        $recent = wp_insert_post(['post_type' => 'contact_message', 'post_status' => 'private',
+            'post_date_gmt' => gmdate('Y-m-d H:i:s', time() - 300 * DAY_IN_SECONDS)]);
+        $article = wp_insert_post(['post_type' => 'post', 'post_status' => 'publish',
+            'post_date_gmt' => '2020-01-01 00:00:00']);
+
+        WpState::fire('boissonsx_purge_contact_messages');
+
+        $this->assertArrayNotHasKey($old, WpState::$posts);
+        $this->assertArrayNotHasKey($old, WpState::$meta);
+        $this->assertArrayHasKey($recent, WpState::$posts);
+        // Only contact messages are ever deleted
+        $this->assertArrayHasKey($article, WpState::$posts);
+    }
+
+    public function testRetentionCanBeChangedOrTurnedOff(): void
+    {
+        $id = wp_insert_post(['post_type' => 'contact_message', 'post_status' => 'private',
+            'post_date_gmt' => gmdate('Y-m-d H:i:s', time() - 40 * DAY_IN_SECONDS)]);
+
+        WpState::$filters['boissonsx_contact_retention_days'] = 0;
+        $this->assertSame(0, boissonsx_purge_contact_messages());
+        $this->assertArrayHasKey($id, WpState::$posts);
+
+        WpState::$filters['boissonsx_contact_retention_days'] = 30;
+        $this->assertSame(1, boissonsx_purge_contact_messages());
+        $this->assertArrayNotHasKey($id, WpState::$posts);
+    }
+
+    public function testDeletesABacklogInBatchesOf200(): void
+    {
+        for ($i = 0; $i < 201; $i++) {
+            wp_insert_post(['post_type' => 'contact_message', 'post_status' => 'private',
+                'post_date_gmt' => '2020-01-01 00:00:00']);
+        }
+
+        $this->assertSame(200, boissonsx_purge_contact_messages());
+        $this->assertSame(1, boissonsx_purge_contact_messages());
+    }
 }

@@ -67,6 +67,40 @@ add_action('admin_init', function () {
     }
 });
 
+// Québec Law 25: delete contact messages once their purpose (a reply, a
+// follow-up order) is past. 12 months by default; set
+// BOISSONSX_CONTACT_RETENTION_DAYS in wp-config to change it, 0 keeps them.
+// Runs daily through WP-Cron, 200 per run so a backlog can't time out.
+function boissonsx_purge_contact_messages() {
+    $default = defined('BOISSONSX_CONTACT_RETENTION_DAYS') ? BOISSONSX_CONTACT_RETENTION_DAYS : 365;
+    $days = (int) apply_filters('boissonsx_contact_retention_days', $default);
+    if ($days < 1) {
+        return 0;
+    }
+
+    $ids = get_posts([
+        'post_type' => 'contact_message',
+        'post_status' => 'any',
+        'posts_per_page' => 200,
+        'fields' => 'ids',
+        'date_query' => [[
+            'column' => 'post_date_gmt',
+            'before' => gmdate('Y-m-d H:i:s', time() - $days * DAY_IN_SECONDS),
+        ]],
+    ]);
+    foreach ($ids as $post_id) {
+        wp_delete_post($post_id, true);
+    }
+    return count($ids);
+}
+add_action('boissonsx_purge_contact_messages', 'boissonsx_purge_contact_messages');
+
+add_action('init', function () {
+    if (!wp_next_scheduled('boissonsx_purge_contact_messages')) {
+        wp_schedule_event(time(), 'daily', 'boissonsx_purge_contact_messages');
+    }
+});
+
 // Client IP for the rate limit. Behind a reverse proxy listed in
 // BOISSONSX_TRUSTED_PROXIES, the visitor is the right-most untrusted
 // X-Forwarded-For hop. IPv6 is keyed by /64, what one host usually holds.
