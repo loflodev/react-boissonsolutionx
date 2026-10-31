@@ -7,19 +7,36 @@ interface GraphqlMock {
   failNextSubmit: (status: number) => void;
 }
 
-// The WordPress content the build baked into the page (<script id="__HOME_DATA__">)
-const loadHomeData = async (request: APIRequestContext): Promise<unknown> => {
-  const html = await (await request.get("/")).text();
-  const json = html.match(/<script id="__HOME_DATA__" type="application\/json">(.*?)<\/script>/s)?.[1];
-  if (!json) throw new Error("No __HOME_DATA__ in the built page: run `npm run build` first");
+// The WordPress content the build baked into a page (<script id="__HOME_DATA__">
+// on the home page, <script id="__PRIVACY_DATA__"> on the privacy policy)
+const loadBakedData = async (
+  request: APIRequestContext,
+  path: string,
+  scriptId: string
+): Promise<unknown> => {
+  const html = await (await request.get(path)).text();
+  const pattern = new RegExp(`<script id="${scriptId}" type="application/json">(.*?)</script>`, "s");
+  const json = html.match(pattern)?.[1];
+  if (!json) throw new Error(`No ${scriptId} in ${path}: run \`npm run build\` first`);
   return JSON.parse(json);
+};
+
+const loadContent = async (request: APIRequestContext) => {
+  const [home, privacy] = await Promise.all([
+    loadBakedData(request, "/", "__HOME_DATA__"),
+    loadBakedData(request, "/politique-de-confidentialite", "__PRIVACY_DATA__"),
+  ]);
+  return { home, privacy };
 };
 
 // Answer WPGraphQL locally so the tests never write to the real WordPress:
 // content queries get the data baked into the page, mutations are recorded.
 // The handler never touches the page, so a request still in flight when a
 // test ends cannot fail it.
-const mockGraphql = async (page: Page, homeData: unknown): Promise<GraphqlMock> => {
+const mockGraphql = async (
+  page: Page,
+  content: Awaited<ReturnType<typeof loadContent>>
+): Promise<GraphqlMock> => {
   const submissions: GraphqlMock["submissions"] = [];
   let failStatus: number | null = null;
 
@@ -36,7 +53,8 @@ const mockGraphql = async (page: Page, homeData: unknown): Promise<GraphqlMock> 
         json: { data: { createContactMessage: { clientMutationId: "e2e" } } },
       });
     }
-    return route.fulfill({ json: { data: homeData } });
+    const isPrivacy = String(body?.query).includes("politiqueDeConfidentialite");
+    return route.fulfill({ json: { data: isPrivacy ? content.privacy : content.home } });
   });
 
   return {
@@ -65,7 +83,7 @@ export const test = base.extend<{ graphql: GraphqlMock }>({
   graphql: [
     async ({ page, request }, use) => {
       await mockMedia(page);
-      await use(await mockGraphql(page, await loadHomeData(request)));
+      await use(await mockGraphql(page, await loadContent(request)));
       await page.unrouteAll({ behavior: "ignoreErrors" });
     },
     { auto: true },

@@ -73,3 +73,38 @@ test("the browser console stays clean", async ({ page }) => {
   await page.reload({ waitUntil: "networkidle" });
   expect(errors).toEqual([]);
 });
+
+test.describe("privacy policy", () => {
+  test("the footer link opens the policy page", async ({ page }) => {
+    await page
+      .getByRole("navigation", { name: "Liens légaux" })
+      .getByRole("link", { name: "Politique de confidentialité" })
+      .click();
+    await expect(page).toHaveURL(/\/politique-de-confidentialite$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Politique de confidentialité");
+  });
+
+  test("the table of contents follows the section being read", async ({ page, isMobile }) => {
+    test.skip(isMobile, "the table of contents only stays in view on desktop");
+    await page.goto("/politique-de-confidentialite");
+    const toc = page.getByRole("navigation", { name: "Sur cette page" });
+
+    await toc.getByRole("link", { name: /Vos droits/ }).click();
+    await expect(page).toHaveURL(/#vos-droits$/);
+    await expect(toc.getByRole("link", { name: /Vos droits/ })).toHaveAttribute("aria-current", "true");
+    await expect(toc.locator('[aria-current="true"]')).toHaveCount(1);
+
+    await page.keyboard.press("End");
+    await expect(toc.getByRole("link", { name: /Nous joindre/ })).toHaveAttribute("aria-current", "true");
+  });
+
+  test("the footer navigation leads back to the home sections", async ({ page }) => {
+    await page.goto("/politique-de-confidentialite");
+    await page
+      .getByRole("navigation", { name: "Navigation du pied de page" })
+      .getByRole("link", { name: "À propos de nous" })
+      .click();
+    await expect(page).toHaveURL(/\/#about$/);
+    await expect(page.locator("#about")).toBeInViewport();
+  });
+});

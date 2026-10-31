@@ -7,22 +7,26 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { HOME_PAGE_QUERY_KEY } from "./hooks/useHomePageData";
-import { HOME_DATA_SCRIPT_ID } from "./entry-shared";
+import { PRIVACY_PAGE_QUERY_KEY } from "./hooks/usePrivacyPageData";
+import { HOME_DATA_SCRIPT_ID, PRIVACY_DATA_SCRIPT_ID } from "./entry-shared";
 
 const queryClient = new QueryClient();
 
 // Reuse the WordPress content baked in at build time so the first render
 // matches the prerendered HTML; React Query still refreshes it in the background
-const homeDataScript = document.getElementById(HOME_DATA_SCRIPT_ID);
-if (homeDataScript?.textContent) {
+const EMBEDDED_DATA = [
+  [HOME_DATA_SCRIPT_ID, HOME_PAGE_QUERY_KEY],
+  [PRIVACY_DATA_SCRIPT_ID, PRIVACY_PAGE_QUERY_KEY],
+] as const;
+
+for (const [scriptId, queryKey] of EMBEDDED_DATA) {
+  const script = document.getElementById(scriptId);
+  if (!script?.textContent) continue;
   // Unreadable data must not stop the app: React Query fetches it instead
   try {
-    queryClient.setQueryData(
-      HOME_PAGE_QUERY_KEY,
-      JSON.parse(homeDataScript.textContent)
-    );
+    queryClient.setQueryData(queryKey, JSON.parse(script.textContent));
   } catch (error) {
-    console.error("Embedded home data unreadable, fetching instead:", error);
+    console.error(`Embedded ${scriptId} unreadable, fetching instead:`, error);
   }
 }
 

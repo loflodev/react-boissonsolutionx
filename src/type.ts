@@ -54,6 +54,22 @@ export interface Page {
   heroSection: HeroSection;
   ourProducts: OurProducts;
 }
+// ACF field names as WPGraphQL exposes them (generated from the labels)
+export interface PrivacyPolicyFields {
+  intro: string | null;
+  derniereMiseAJour: string | null;
+  responsableNom: string | null;
+  responsableTitre: string | null;
+  officeremail: string | null;
+  officeraddress: string | null;
+}
+
+export interface PrivacyPage {
+  title: string;
+  content: string;
+  politiqueDeConfidentialite: PrivacyPolicyFields | null;
+}
+
 export interface GraphQLError {
   message: string;
   locations?: Array<{
@@ -63,19 +79,6 @@ export interface GraphQLError {
   path?: string[];
   extensions?: Record<string, unknown>;
 }
-export interface HomePageDataResponse {
-  data?: {
-    page: Page;
-  };
-  errors?: GraphQLError[];
-  extensions?: {
-    debug?: Array<{
-      type: string;
-      message: string;
-    }>;
-  };
-}
-
 export interface ContactFormData {
   fullName: string;
   email: string;

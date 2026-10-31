@@ -8,6 +8,7 @@ import {
   escapeXml,
   fillTemplate,
   pickPreloadFonts,
+  setPageMeta,
   stripHtml,
   toOrigin,
   toScriptJson,
@@ -95,6 +96,14 @@ describe("buildSitemap", () => {
     expect(xml).not.toMatch(/&(?!#\d+;)/);
   });
 
+  it("lists the other pages without images", () => {
+    const withPages = buildSitemap(SITE, [], "2026-10-29", ["/politique-de-confidentialite"]);
+    expect(withPages).toContain(
+      `<url>\n    <loc>${SITE}/politique-de-confidentialite</loc>\n    <lastmod>2026-10-29</lastmod>\n  </url>`
+    );
+    expect(xml.match(/<url>/g)).toHaveLength(1);
+  });
+
   it("skips products without an image", () => {
     const noImage = { ...product("Sans image", "x"), cover: null };
     expect(buildSitemap(SITE, [noImage], "2026-10-29").match(/<image:image>/g)).toHaveLength(1);
@@ -122,6 +131,11 @@ describe("buildLlmsTxt", () => {
     for (const anchor of ["#ourProducts", "#about", "#contactForm"]) {
       expect(txt).toContain(`${SITE}/${anchor}`);
     }
+  });
+
+  it("appends the legal links", () => {
+    const withLegal = buildLlmsTxt(SITE, {}, [], [{ name: "Confidentialité", path: "/conf" }]);
+    expect(withLegal.endsWith(`- [Confidentialité](${SITE}/conf)\n`)).toBe(true);
   });
 });
 
@@ -164,8 +178,8 @@ describe("buildHeadExtra", () => {
     fonts: ["inter-latin-opsz-normal-X.woff2"],
     wpOrigin: "https://api.boissonsolutionx.ca",
     jsonLd: [{ "@type": "Organization" }],
-    homeData: { page: { title: "</script>" } },
-    homeDataId: "__HOME_DATA__",
+    pageData: { page: { title: "</script>" } },
+    pageDataId: "__HOME_DATA__",
   });
 
   it("preconnects to WordPress and preloads the fonts (CORS, as fonts require)", () => {
@@ -181,8 +195,14 @@ describe("buildHeadExtra", () => {
     expect(head.match(/<\/script>/g)).toHaveLength(2);
   });
 
+  it("omits the embedded data when a page has none", () => {
+    const page = buildHeadExtra({ jsonLd: [] });
+    expect(page).not.toContain('type="application/json"');
+    expect(page.match(/<\/script>/g)).toHaveLength(1);
+  });
+
   it("omits the preconnect when the origin is unknown", () => {
-    const minimal = buildHeadExtra({ jsonLd: [], homeData: {}, homeDataId: "x", wpOrigin: null });
+    const minimal = buildHeadExtra({ jsonLd: [], pageData: {}, pageDataId: "x", wpOrigin: null });
     expect(minimal).not.toContain("preconnect");
   });
 });
@@ -203,5 +223,48 @@ describe("fillTemplate", () => {
     expect(html).toContain(appHtml);
     expect(html).toContain('{"name":"$\'"}');
     expect(html.match(/<script type="module"/g)).toHaveLength(1);
+  });
+});
+
+describe("setPageMeta", () => {
+  const template = `<head>
+    <title>Accueil</title>
+    <meta
+      name="description"
+      content="Home description"
+    />
+    <link rel="canonical" href="__SITE_URL__/" />
+    <link rel="preload" as="image" href="/bottles.webp" fetchpriority="high" />
+    <meta property="og:title" content="Accueil" />
+    <meta
+      property="og:description"
+      content="Home description"
+    />
+    <meta property="og:url" content="__SITE_URL__/" />
+    <meta property="og:image" content="__SITE_URL__/og-image.jpg" />
+    <meta name="twitter:title" content="Accueil" />
+    <meta
+      name="twitter:description"
+      content="Home description"
+    />
+  </head>`;
+  const html = setPageMeta(template, {
+    title: "Politique – Boisson SolutionX",
+    description: "Vos droits & nos pratiques",
+    url: "__SITE_URL__/politique",
+  });
+
+  it("replaces the title, description and URL in every tag", () => {
+    expect(html).toContain("<title>Politique – Boisson SolutionX</title>");
+    expect(html.match(/content="Politique – Boisson SolutionX"/g)).toHaveLength(2);
+    expect(html.match(/content="Vos droits &#38; nos pratiques"/g)).toHaveLength(3);
+    expect(html).toContain('<link rel="canonical" href="__SITE_URL__/politique" />');
+    expect(html).toContain('<meta property="og:url" content="__SITE_URL__/politique" />');
+    expect(html).not.toMatch(/Accueil|Home description/);
+  });
+
+  it("drops the hero image preload but keeps the social image", () => {
+    expect(html).not.toContain("bottles.webp");
+    expect(html).toContain("og-image.jpg");
   });
 });

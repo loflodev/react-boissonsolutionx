@@ -159,6 +159,86 @@
     }
   }
 
+  /* Privacy policy text from the WordPress editor (pages/PrivacyPolicy.tsx).
+     Each h2 opens a section: a divider, then its number as an eyebrow */
+  .policy-body {
+    counter-reset: policy-section;
+    color: var(--color-muted);
+    line-height: 1.625;
+    & > * + * {
+      margin-top: 1rem;
+    }
+    & h2 {
+      counter-increment: policy-section;
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 1.5rem;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+      color: var(--color-cream);
+      margin-top: 2.5rem;
+      margin-bottom: 1.5rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--color-line);
+      &::before {
+        content: counter(policy-section, decimal-leading-zero);
+        display: block;
+        margin-bottom: 1rem;
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        font-variant-numeric: tabular-nums;
+        color: var(--color-secondary);
+      }
+      &:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+      }
+      @media (width >= 48rem) {
+        font-size: 1.875rem;
+      }
+    }
+    & h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--color-cream);
+      margin-top: 2rem;
+    }
+    & ul,
+    & ol {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding-left: 1.25rem;
+    }
+    & ul {
+      list-style: disc;
+    }
+    & ol {
+      list-style: decimal;
+    }
+    & li::marker {
+      color: var(--color-secondary);
+    }
+    & strong,
+    & b {
+      color: var(--color-cream);
+      font-weight: 600;
+    }
+    & a {
+      color: var(--color-cream);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      transition: color 150ms ease-out;
+      &:hover {
+        color: var(--color-secondary);
+      }
+    }
+  }
+
   /* Decorative section layers (see components/common/Decor.tsx) */
   .decor-grain {
     opacity: 0.07;

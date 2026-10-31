@@ -12,6 +12,14 @@ test("the page has no WCAG 2.2 AA violations", async ({ page }) => {
   expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(", ")}`)).toEqual([]);
 });
 
+test("the privacy policy has no WCAG 2.2 AA violations", async ({ page }) => {
+  await page.goto("/politique-de-confidentialite");
+  await revealAll(page);
+
+  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+  expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(", ")}`)).toEqual([]);
+});
+
 test.describe("mobile", () => {
   test.skip(({ isMobile }) => !isMobile, "the menu button only shows on small screens");
 

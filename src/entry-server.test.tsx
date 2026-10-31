@@ -3,8 +3,8 @@
 import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
-import { render, sanitizeHomeContent } from "./entry-server";
-import { homePage } from "./test/fixtures";
+import { PRIVACY_PATH, render, sanitizeHomeContent, sanitizePrivacyContent } from "./entry-server";
+import { homePage, privacyPage } from "./test/fixtures";
 
 describe("prerender sanitizing", () => {
   // What scripts/prerender.mjs does before baking the page
@@ -55,5 +55,30 @@ describe("prerender (entry-server)", () => {
     // Reveal only hides under html.js-reveal, which the server never sets
     expect(html).not.toContain("js-reveal");
     expect(html).not.toMatch(/style="[^"]*opacity:\s*0/);
+  });
+});
+
+describe("prerender of the privacy policy", () => {
+  const purifier = createDOMPurify(new JSDOM("").window);
+  const privacy = sanitizePrivacyContent(
+    {
+      page: {
+        ...privacyPage.page,
+        content: privacyPage.page.content + '<h2 onclick="x()">Droits</h2><script>alert(1)</script>',
+      },
+    },
+    purifier
+  );
+  const html = render(homePage, PRIVACY_PATH, privacy);
+
+  it("keeps the headings but strips attributes and scripts", () => {
+    expect(privacy.page.content).toContain("<h2>Droits</h2>");
+    expect(privacy.page.content).not.toMatch(/class=|onclick|<script/);
+  });
+
+  it("bakes the policy, its heading ids and table of contents into the HTML", () => {
+    expect(html).toMatch(/<h1[^>]*>Politique de confidentialité<\/h1>/);
+    expect(html).toContain('<h2 id="portee-de-la-politique">Portée de la politique</h2>');
+    expect(html).toContain('href="#droits"');
   });
 });

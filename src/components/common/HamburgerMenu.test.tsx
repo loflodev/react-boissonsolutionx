@@ -59,7 +59,7 @@ describe("HamburgerMenu", () => {
 
   it("closes after following a link and marks the current section", async () => {
     const user = userEvent.setup();
-    const { button } = renderMenu("#about");
+    const { button } = renderMenu("/#about");
     await user.click(button);
 
     const current = screen.getByRole("link", { name: "À propos de nous" });

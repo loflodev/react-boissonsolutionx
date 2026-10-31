@@ -14,6 +14,16 @@ test.describe("without JavaScript (crawlers, AI bots, link previews)", () => {
     expect(await page.locator("#ourProducts article").count()).toBeGreaterThan(0);
     await expect(page.getByRole("heading", { name: "Nous Contacter" })).toBeVisible();
   });
+
+  test("serves the privacy policy with its own metadata", async ({ page }) => {
+    await page.goto("/politique-de-confidentialite");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Politique de confidentialité");
+    await expect(page).toHaveTitle(/^Politique de confidentialité – Boisson SolutionX$/);
+    const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
+    expect(canonical).toMatch(/^https:\/\/[^/]+\/politique-de-confidentialite$/);
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", canonical!);
+    await expect(page.locator('link[rel="preload"][href="/bottles.webp"]')).toHaveCount(0);
+  });
 });
 
 test.describe("head metadata", () => {
@@ -117,6 +127,7 @@ test.describe("crawler files", () => {
     expect(xml).toMatch(/<loc>https:\/\/[^<]+\/<\/loc>/);
     expect(xml).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
     expect(xml).toContain("og-image.jpg</image:loc>");
+    expect(xml).toMatch(/<loc>https:\/\/[^<]+\/politique-de-confidentialite<\/loc>/);
   });
 
   test("llms.txt summarizes the brand and products", async ({ request }) => {

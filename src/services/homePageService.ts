@@ -6,8 +6,8 @@ import {
   type ContactFormData,
   type ContactFormResponse,
   type GraphQLError,
-  type HomePageDataResponse,
   type Page,
+  type PrivacyPage,
 } from "../type";
 import axiosInstance, {
   CONTACT_FORM_ID,
@@ -66,15 +66,14 @@ const assertNoGraphQLErrors = (
   }
 };
 
-export const getHomePageData = async (
-  query: string
-): Promise<{ page: Page }> => {
+// POST a query and return its data, or throw one of the service errors
+const fetchPageData = async <T>(query: string): Promise<T> => {
   try {
     if (!query || typeof query !== "string") {
       throw new Error("GraphQL query is required and must be a string");
     }
 
-    const response = await axiosInstance.post<HomePageDataResponse>(
+    const response = await axiosInstance.post<{ data?: T; errors?: GraphQLError[] }>(
       GRAPHQL_ENDPOINT,
       {
         query,
@@ -96,6 +95,19 @@ export const getHomePageData = async (
   } catch (error) {
     throw toServiceError(error);
   }
+};
+
+export const getHomePageData = (query: string) => fetchPageData<{ page: Page }>(query);
+
+// A missing page is an error too: the policy must never render empty
+export const getPrivacyPageData = async (
+  query: string
+): Promise<{ page: PrivacyPage }> => {
+  const data = await fetchPageData<{ page: PrivacyPage | null }>(query);
+  if (!data.page) {
+    throw new GraphQLServiceError("Privacy policy page not found", []);
+  }
+  return { page: data.page };
 };
 
 export const submitContactForm = async (

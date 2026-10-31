@@ -62,7 +62,8 @@ export const buildJsonLd = (siteUrl, products) => [
   },
 ];
 
-export const buildSitemap = (siteUrl, products, lastmod) => {
+// `pages`: paths of the other prerendered pages (e.g. the privacy policy)
+export const buildSitemap = (siteUrl, products, lastmod, pages = []) => {
   const images = products
     .filter((p) => p.cover?.node?.sourceUrl)
     .map(
@@ -82,12 +83,21 @@ export const buildSitemap = (siteUrl, products, lastmod) => {
     <image:image>
       <image:loc>${siteUrl}/og-image.jpg</image:loc>
     </image:image>${images}
-  </url>
+  </url>${pages
+    .map(
+      (path) => `
+  <url>
+    <loc>${siteUrl}${escapeXml(path)}</loc>
+    <lastmod>${lastmod}</lastmod>
+  </url>`
+    )
+    .join("")}
 </urlset>
 `;
 };
 
-export const buildLlmsTxt = (siteUrl, hero, products) => `# ${SITE_NAME}
+// `legalLinks`: [{ name, path }] appended to the links
+export const buildLlmsTxt = (siteUrl, hero, products, legalLinks = []) => `# ${SITE_NAME}
 
 > ${SITE_DESCRIPTION}
 
@@ -123,7 +133,7 @@ Chez Boisson SolutionX, tous nos jus de fruits naturels sont mélangés avec du 
 - [Produits](${siteUrl}/#ourProducts)
 - [À propos](${siteUrl}/#about)
 - [Nous contacter](${siteUrl}/#contactForm)
-`;
+${legalLinks.map((link) => `- [${link.name}](${siteUrl}${link.path})\n`).join("")}`;
 
 // Fill the built index.html (or robots.txt) placeholders. Replacer functions,
 // not strings: in a replacement string `$'`, `` $` `` and `$&` are patterns,
@@ -149,7 +159,8 @@ export const toOrigin = (url) => {
   }
 };
 
-export const buildHeadExtra = ({ fonts = [], wpOrigin, jsonLd, homeData, homeDataId }) =>
+// pageData/pageDataId: the WordPress content embedded for hydration
+export const buildHeadExtra = ({ fonts = [], wpOrigin, jsonLd, pageData, pageDataId }) =>
   [
     ...(wpOrigin ? [`<link rel="preconnect" href="${escapeAttr(wpOrigin)}" />`] : []),
     ...fonts.map(
@@ -157,5 +168,27 @@ export const buildHeadExtra = ({ fonts = [], wpOrigin, jsonLd, homeData, homeDat
         `<link rel="preload" as="font" type="font/woff2" href="/assets/${escapeAttr(file)}" crossorigin />`
     ),
     `<script type="application/ld+json">${toScriptJson(jsonLd)}</script>`,
-    `<script id="${homeDataId}" type="application/json">${toScriptJson(homeData)}</script>`,
+    ...(pageData
+      ? [`<script id="${pageDataId}" type="application/json">${toScriptJson(pageData)}</script>`]
+      : []),
   ].join("\n    ");
+
+// Swap the home page's <head> metadata in the built index.html for another
+// page's, and drop the hero image preload only the home page needs. Runs
+// before fillTemplate, so `url` may use the __SITE_URL__ placeholder
+export const setPageMeta = (html, { title, description, url }) => {
+  const t = escapeAttr(title);
+  const d = escapeAttr(description);
+  const u = escapeAttr(url);
+  return html
+    .replace(/<title>[^<]*<\/title>/, () => `<title>${t}</title>`)
+    .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, (_, a, b) => `${a}${d}${b}`)
+    .replace(/(<link rel="canonical" href=")[^"]*(")/, (_, a, b) => `${a}${u}${b}`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/, (_, a, b) => `${a}${u}${b}`)
+    .replace(/(<meta (?:property|name)="(?:og|twitter):title" content=")[^"]*(")/g, (_, a, b) => `${a}${t}${b}`)
+    .replace(
+      /(<meta\s+(?:property|name)="(?:og|twitter):description"\s+content=")[^"]*(")/g,
+      (_, a, b) => `${a}${d}${b}`
+    )
+    .replace(/\s*<link rel="preload" as="image" href="\/bottles\.webp"[^>]*>/, "");
+};

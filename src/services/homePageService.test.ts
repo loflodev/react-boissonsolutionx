@@ -6,7 +6,7 @@ import {
   NetworkError,
   ValidationError,
 } from "../type";
-import { getHomePageData, submitContactForm } from "./homePageService";
+import { getHomePageData, getPrivacyPageData, submitContactForm } from "./homePageService";
 
 vi.mock("../api/axios", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../api/axios")>();
@@ -36,6 +36,18 @@ const axiosError = (withResponse: boolean, withRequest = true) => {
 
 beforeEach(() => {
   post.mockReset();
+});
+
+describe("getPrivacyPageData", () => {
+  it("returns the page data", async () => {
+    post.mockResolvedValue({ status: 200, data: { data: { page: { title: "P" } } } });
+    await expect(getPrivacyPageData("query")).resolves.toEqual({ page: { title: "P" } });
+  });
+
+  it("fails when the page does not exist, instead of rendering an empty policy", async () => {
+    post.mockResolvedValue({ status: 200, data: { data: { page: null } } });
+    await expect(getPrivacyPageData("query")).rejects.toBeInstanceOf(GraphQLServiceError);
+  });
 });
 
 describe("getHomePageData", () => {

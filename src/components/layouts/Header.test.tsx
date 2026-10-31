@@ -15,10 +15,10 @@ describe("Header", () => {
     render(<Header />);
     const nav = screen.getByRole("navigation", { name: "Navigation principale" });
     expect(within(nav).getAllByRole("link").map((a) => a.getAttribute("href"))).toEqual([
-      "#hero",
-      "#ourProducts",
-      "#about",
-      "#contact",
+      "/#hero",
+      "/#ourProducts",
+      "/#about",
+      "/#contact",
     ]);
   });
 

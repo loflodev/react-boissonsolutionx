@@ -6,7 +6,7 @@ import HamburgerMenu from "../common/HamburgerMenu";
 import HeaderMenu from "../common/HeaderMenu";
 import HeaderLogo from "../common/HearderLogo";
 
-const sectionIds = menu.map((item) => item.link.slice(1));
+const sectionIds = menu.map((item) => item.link.split("#")[1]);
 
 const SCROLLED_THRESHOLD_PX = 24;
 
@@ -26,7 +26,7 @@ const useHasScrolled = () => {
 
 const Header = () => {
   const activeId = useActiveSection(sectionIds);
-  const activeLink = activeId ? `#${activeId}` : null;
+  const activeLink = activeId ? `/#${activeId}` : null;
   const hasScrolled = useHasScrolled();
   // The open menu hangs from the bar, so the bar must be material too
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,11 +44,11 @@ const Header = () => {
       </a>
       <div className="mx-auto max-w-6xl px-6 md:px-10">
         <div className="flex py-3 items-center justify-between">
-          <HeaderLogo alt="Boisson SolutionX – Accueil" link="#hero" logo="/bsx-logo.webp" />
+          <HeaderLogo alt="Boisson SolutionX – Accueil" link="/#hero" logo="/bsx-logo.webp" />
           <HeaderMenu color="primary" menu={menu} activeLink={activeLink} />
 
           <div className="flex items-center gap-3 ml-10">
-            <Button label="Contact" variant="primary" size="sm" asLink to="#contactForm" />
+            <Button label="Contact" variant="primary" size="sm" asLink to="/#contactForm" />
             <HamburgerMenu menu={menu} activeLink={activeLink} onOpenChange={setIsMenuOpen} />
           </div>
         </div>
