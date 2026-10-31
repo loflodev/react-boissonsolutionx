@@ -3,6 +3,7 @@ import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
+import axiosInstance from "./api/axios";
 import { HOME_PAGE_QUERY } from "./graphql/homePageQuery";
 import { PRIVACY_PAGE_QUERY } from "./graphql/privacyPageQuery";
 import { HOME_PAGE_QUERY_KEY } from "./hooks/useHomePageData";
@@ -13,6 +14,12 @@ import type { Page, PrivacyPage } from "./type";
 export { HOME_DATA_SCRIPT_ID, PRIVACY_DATA_SCRIPT_ID, PRIVACY_PATH } from "./entry-shared";
 export { convertToArray } from "./helpers/utils";
 export { sanitizeHomeContent, sanitizePrivacyContent } from "./helpers/sanitizeHtml";
+
+// This bundle only runs in Node at build time, so naming the client here never
+// reaches browsers (which forbid it anyway). A generic "axios/x" agent from a
+// datacenter IP is what host firewalls block first
+axiosInstance.defaults.headers.common["User-Agent"] =
+  "BoissonSolutionX-Prerender/1.0 (+https://boissonsolutionx.ca)";
 
 // Built with `vite build --ssr`, so the WordPress endpoint comes from the same
 // VITE_* env as the browser bundle

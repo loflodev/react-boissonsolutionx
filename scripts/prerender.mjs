@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 import { loadEnv } from "vite";
+import { withRetry } from "./retry.mjs";
 import {
   buildHeadExtra,
   buildJsonLd,
@@ -55,10 +56,9 @@ const main = async () => {
   // sanitized here, before it reaches the static HTML or its embedded data:
   // in the browser the hydration keeps whatever markup the server sent
   const purifier = createDOMPurify(new JSDOM("").window);
-  const [homeContent, privacyContent] = await Promise.all([
-    loadHomeContent(),
-    loadPrivacyContent(),
-  ]);
+  // One request at a time: the host's firewall reacts to bursts from CI
+  const homeContent = await withRetry(loadHomeContent, { label: "home" });
+  const privacyContent = await withRetry(loadPrivacyContent, { label: "privacy policy" });
   const content = sanitizeHomeContent(homeContent, purifier);
   const privacy = sanitizePrivacyContent(privacyContent, purifier);
   const products = convertToArray(content.page.ourProducts);
